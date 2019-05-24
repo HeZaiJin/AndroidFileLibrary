@@ -5,6 +5,7 @@ import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import com.hand.document.io.Volume;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,16 @@ public class StorageUtils {
                     info.maxFileSize = ((StorageVolume) volume).getMaxFileSize();
                     info.state = ((StorageVolume) volume).getState();
                 } else {
-
+                    info.id = ReflectUtils.getFiledString(volume, "id");
+                    info.desc = (String) ReflectUtils.getMethod(volume, "getDescription", null);
+                    info.primary = (Boolean) ReflectUtils.getMethod(volume, "isPrimary", null);
+                    info.removable = !"emulated".equals(info.id);
+                    info.path = ReflectUtils.getFiledString(volume, "path");
+                    File file = new File(info.path);
+                    if (file.exists()) {
+                        info.maxFileSize = file.getTotalSpace();
+                    }
+                    info.state = ReflectUtils.getFiledString(volume, "state");
                 }
                 currentVolumes.add(info);
             }
