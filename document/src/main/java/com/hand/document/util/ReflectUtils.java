@@ -17,12 +17,12 @@ public class ReflectUtils {
         return value;
     }
 
-    public static Object getMethod(Object object, String method, Class<?>... parameterTypes) {
+    public static Object getMethod(Object object, String method) {
         String value = "";
         try {
-            Method targetMethod = object.getClass().getDeclaredMethod(method, parameterTypes);
+            Method targetMethod = object.getClass().getDeclaredMethod(method, null);
             targetMethod.setAccessible(true);
-            return targetMethod.invoke(object, parameterTypes);
+            return targetMethod.invoke(object, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
