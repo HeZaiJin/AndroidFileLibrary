@@ -29,7 +29,7 @@ class FolderNavigationBar @JvmOverloads constructor(context: Context, attrs: Att
         return this
     }
 
-    fun openFolder(info: Object, title: String) {
+    fun openFolder(info: Any, title: String) {
         val navigationInfo = NavigationInfo()
         navigationInfo.mInfo = info
         navigationInfo.mTitle = title
@@ -40,12 +40,12 @@ class FolderNavigationBar @JvmOverloads constructor(context: Context, attrs: Att
 
     class NavigationInfo {
         var mIndex: Int = 0
-        var mInfo: Object? = null
+        var mInfo: Any? = null
         var mTitle: String? = null
     }
 
     interface NavigateListener {
-        fun onNavigate(info: Object?)
+        fun onNavigate(info: Any?)
     }
 
     fun onBackPressed(): Boolean {
