@@ -74,7 +74,7 @@ public final class StorageVolume implements Parcelable {
     }
 
     /**
-     * Returns true if the volume is the primary shared/external storage, which is the volume
+     * Returns true if the volume is the isPrimary shared/external storage, which is the volume
      * backed by {@link Environment#getExternalStorageDirectory()}.
      */
     public boolean isPrimary() {

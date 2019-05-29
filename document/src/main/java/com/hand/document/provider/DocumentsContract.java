@@ -233,7 +233,7 @@ public final class DocumentsContract {
         public static final String COLUMN_MIME_TYPE = "mime_type";
 
         /**
-         * Display name of a document, used as the primary title displayed to a
+         * Display name of a document, used as the isPrimary title displayed to a
          * user. This column is required.
          * <p>
          * Type: STRING
@@ -286,6 +286,8 @@ public final class DocumentsContract {
          * @see #FLAG_SUPPORTS_REMOVE
          */
         public static final String COLUMN_FLAGS = "flags";
+
+        public static final String COLUMN_PATH = "path";
 
         /**
          * Size of a document, in bytes, or {@code null} if unknown. This column
@@ -479,6 +481,8 @@ public final class DocumentsContract {
          */
         public static final String COLUMN_ROOT_ID = "root_id";
 
+        public static final String COLUMN_PATH = "path";
+
         /**
          * Flags that apply to a root. This column is required.
          * <p>
@@ -663,6 +667,9 @@ public final class DocumentsContract {
          * @see #COLUMN_FLAGS
          */
         public static final int FLAG_REMOVABLE_USB = 1 << 20;
+
+        public static final int FLAG_SUPPORTS_EDIT = 1 << 90;
+
     }
 
     /**

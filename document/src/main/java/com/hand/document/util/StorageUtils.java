@@ -34,7 +34,7 @@ public class StorageUtils {
                 if (BuildUtils.hasPie()) {
                     info.id = ((StorageVolume) volume).getId();
                     info.desc = ((StorageVolume) volume).getDescription(context);
-                    info.primary = ((StorageVolume) volume).isPrimary();
+                    info.isPrimary = ((StorageVolume) volume).isPrimary();
                     info.removable = ((StorageVolume) volume).isRemovable();
                     info.path = ((StorageVolume) volume).getPath();
                     info.maxFileSize = ((StorageVolume) volume).getMaxFileSize();
@@ -42,7 +42,7 @@ public class StorageUtils {
                 } else {
                     info.id = ReflectUtils.getFiledString(volume, "id");
                     info.desc = (String) ReflectUtils.getMethod(volume, "getDescription");
-                    info.primary = (Boolean) ReflectUtils.getMethod(volume, "isPrimary");
+                    info.isPrimary = (Boolean) ReflectUtils.getMethod(volume, "isPrimary");
                     info.removable = !"emulated".equals(info.id);
                     info.path = ReflectUtils.getFiledString(volume, "path");
                     File file = new File(info.path);
@@ -52,7 +52,7 @@ public class StorageUtils {
                     info.state = ReflectUtils.getFiledString(volume, "state");
                 }
 
-                if (info.primary && !info.removable && info.path.contains("emulated")) {
+                if (info.isPrimary && !info.removable && info.path.contains("emulated")) {
                     info.path = PATH_EMULATED;
                 }
                 currentVolumes.add(info);
