@@ -9,7 +9,7 @@ import io.reactivex.disposables.Disposable
 
 abstract class BaseActivity : AppCompatActivity() {
 
-    var mPermissionSubscribe: Disposable? = null
+    private var mPermissionSubscribe: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
