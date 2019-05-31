@@ -2,4 +2,12 @@
           package="com.hand.document">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <application>
+        <provider android:authorities="com.hand.document.externalstorage.documents"
+                  android:name=".provider.ExternalStorageProvider"
+                  android:exported="true"
+                  android:grantUriPermissions="true"
+                  android:permission="android.permission.MANAGE_DOCUMENT"></provider>
+
+    </application>
 </manifest>

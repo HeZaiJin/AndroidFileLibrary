@@ -708,6 +708,24 @@ public abstract class DocumentsProvider extends ContentProvider {
     }
 
     /**
+     * WARNING: Sub-classes should not override this method. This method is non-final
+     * solely for the purposes of backwards compatibility.
+     *
+     * @see #queryChildDocuments(String, String[], Bundle),
+     * {@link #queryDocument(String, String[])},
+     * {@link #queryRecentDocuments(String, String[])},
+     * {@link #queryRoots(String[])}, and
+     * {@link #querySearchDocuments(String, String, String[])}.
+     */
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection,
+                        String[] selectionArgs, String sortOrder, CancellationSignal cancellationSignal) {
+        // As of Android-O, ContentProvider#query (w/ bundle arg) is the primary
+        // transport method. We override that, and don't ever delegate to this metohd.
+        throw new UnsupportedOperationException("Pre-Android-O query format not supported.");
+    }
+
+    /**
      * Implementation is provided by the parent class. Cannot be overriden.
      *
      * @see #queryRoots(String[])

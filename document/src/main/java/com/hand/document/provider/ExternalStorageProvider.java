@@ -16,10 +16,10 @@ import androidx.core.os.EnvironmentCompat;
 import androidx.documentfile.provider.DocumentFile;
 import com.hand.document.BuildConfig;
 import com.hand.document.R;
+import com.hand.document.core.SAFManager;
 import com.hand.document.io.Volume;
 import com.hand.document.provider.DocumentsContract.Document;
 import com.hand.document.provider.DocumentsContract.Root;
-import com.hand.document.util.BuildUtils;
 import com.hand.document.util.FileUtils;
 
 import java.io.File;
@@ -27,7 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-import static com.hand.document.provider.DocumentsContract.buildDocumentUriMaybeUsingTree;
 import static com.hand.document.util.FileUtils.getTypeForFile;
 
 public class ExternalStorageProvider extends StorageProvider {
@@ -262,7 +261,7 @@ public class ExternalStorageProvider extends StorageProvider {
             file = getFileForDocId(docId);
         }
 
-        DocumentFile documentFile = getDocumentFile(docId, file);
+        DocumentFile documentFile = SAFManager.getDocumentFile(getContext(), docId, file);
 
         int flags = 0;
 
@@ -361,37 +360,6 @@ public class ExternalStorageProvider extends StorageProvider {
             throw new FileNotFoundException("Missing file for " + docId + " at " + target);
         }
         return target;
-    }
-
-    private DocumentFile getDocumentFile(String docId, File file) {
-        DocumentFile documentFile = null;
-        if(null != file && file.canWrite()){
-            documentFile = DocumentFile.fromFile(file);
-            return documentFile;
-        }
-        if(docId.startsWith(ROOT_ID_SECONDARY) && BuildUtils.hasLollipop()){
-            String newDocId = docId.substring(ROOT_ID_SECONDARY.length());
-            Uri uri = getRootUri(newDocId);
-            if(null == uri){
-                if(null != file) {
-                    documentFile = DocumentFile.fromFile(file);
-                }
-                return documentFile;
-            }
-            Uri fileUri = buildDocumentUriMaybeUsingTree(uri, newDocId);
-            documentFile = BasicDocumentFile.fromUri(mContext, fileUri);
-        }/* else if(docId.startsWith(ROOT_ID_USB)){
-            documentFile = UsbDocumentFile.fromUri(mContext, docId);
-        }*/ else {
-            if(null != file){
-                documentFile = DocumentFile.fromFile(file);
-            } else {
-                documentFile = BasicDocumentFile.fromUri(getContext(),
-                        DocumentsContract.buildDocumentUri(ExternalStorageProvider.AUTHORITY, docId));
-            }
-        }
-
-        return documentFile;
     }
 
     @Override
