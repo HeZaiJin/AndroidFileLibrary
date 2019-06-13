@@ -6,6 +6,6 @@ import com.hand.document.provider.StorageVolumeProvider
 class DocumentApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        StorageVolumeProvider.get().init(applicationContext)
+        StorageVolumeProvider.get(applicationContext)
     }
 }

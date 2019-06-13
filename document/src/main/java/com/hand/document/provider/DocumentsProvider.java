@@ -137,16 +137,16 @@ public abstract class DocumentsProvider extends ContentProvider {
         registerAuthority(info.authority);
 
         // Sanity check our setup
-        if (!info.exported) {
-            throw new SecurityException("Provider must be exported");
-        }
-        if (!info.grantUriPermissions) {
-            throw new SecurityException("Provider must grantUriPermissions");
-        }
-        if (!android.Manifest.permission.MANAGE_DOCUMENTS.equals(info.readPermission)
-                || !android.Manifest.permission.MANAGE_DOCUMENTS.equals(info.writePermission)) {
-            throw new SecurityException("Provider must be protected by MANAGE_DOCUMENTS");
-        }
+//        if (!info.exported) {
+//            throw new SecurityException("Provider must be exported");
+//        }
+//        if (!info.grantUriPermissions) {
+//            throw new SecurityException("Provider must grantUriPermissions");
+//        }
+//        if (!android.Manifest.permission.MANAGE_DOCUMENTS.equals(info.readPermission)
+//                || !android.Manifest.permission.MANAGE_DOCUMENTS.equals(info.writePermission)) {
+//            throw new SecurityException("Provider must be protected by MANAGE_DOCUMENTS");
+//        }
 
         super.attachInfo(context, info);
     }

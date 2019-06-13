@@ -11,11 +11,13 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 import androidx.annotation.NonNull;
 import androidx.documentfile.provider.DocumentFile;
+import com.hand.document.R;
 import com.hand.document.io.IoUtils;
 import com.hand.document.provider.DocumentsContract;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -592,6 +594,25 @@ public class FileUtils {
     private static final int MEGA = KILO * KILO;
     private static final int GIGA = MEGA * KILO;
 
+    public static String formatFileSize(Context context, long size) {
+        final String count;
+        if (size == 0) {
+            return "";
+        } else if (size < KILO) {
+            count = String.valueOf(size);
+            return context.getString(R.string.bytes, count);
+        } else if (size < MEGA) {
+            count = String.valueOf(size / KILO);
+            return context.getString(R.string.kilobytes, count);
+        } else if (size < GIGA) {
+            count = String.valueOf(size / MEGA);
+            return context.getString(R.string.megabytes, count);
+        } else {
+            DecimalFormat onePlace = new DecimalFormat("0.#");
+            count = onePlace.format((float) size / (float) GIGA);
+            return context.getString(R.string.gigabytes, count);
+        }
+    }
 
     public static String makeFilePath(String parentPath, String name) {
         if (TextUtils.isEmpty(parentPath) || TextUtils.isEmpty(name)) {

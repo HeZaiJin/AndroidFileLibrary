@@ -1,6 +1,20 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">My Library</string>
 
     <string name="root_internal_storage">Internal Storage</string>
     <string name="root_external_storage">External Storage</string>
+
+
+    <!-- Size unit, displayed in a button next to an attachment [CHAR LIMIT=5] -->
+    <string name="bytes"><xliff:g id="count">%s</xliff:g> B
+    </string>
+    <!-- Size unit, displayed in a button next to an attachment [CHAR LIMIT=5] -->
+    <string name="kilobytes"><xliff:g id="count">%s</xliff:g> KB
+    </string>
+    <!-- Size unit, displayed in a button next to an attachment  [CHAR LIMIT=5] -->
+    <string name="megabytes"><xliff:g id="count">%s</xliff:g> MB
+    </string>
+    <!-- Size unit, displayed in a button next to an attachment  [CHAR LIMIT=5] -->
+    <string name="gigabytes"><xliff:g id="count">%s</xliff:g> GB
+    </string>
 </resources>

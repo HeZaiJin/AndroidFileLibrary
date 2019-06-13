@@ -91,7 +91,8 @@ public class ExternalStorageProvider extends StorageProvider {
     public boolean onCreate() {
         mHandler = new Handler();
         updateRoots();
-        return super.onCreate();
+        StorageVolumeProvider.get(getContext()).registerObserver(this);
+        return true;
     }
 
     private void updateRoots() {

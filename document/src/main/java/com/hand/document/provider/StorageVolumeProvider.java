@@ -17,23 +17,31 @@ public class StorageVolumeProvider extends BroadcastReceiver {
 
     private static final String TAG = "StorageVolumeProvider";
 
-    private final static StorageVolumeProvider sInstance = new StorageVolumeProvider();
+    private static StorageVolumeProvider sInstance;
 
     private Context mContext;
     private List<Volume> mStorageVolume;
     private List<Observer> mObservers;
 
-    private StorageVolumeProvider() {
+    private StorageVolumeProvider(Context context) {
+        init(context);
     }
 
-    public static StorageVolumeProvider get() {
+    public static StorageVolumeProvider get(Context context) {
+        if (null == sInstance) {
+            synchronized (StorageVolumeProvider.class) {
+                if (null == sInstance) {
+                    sInstance = new StorageVolumeProvider(context);
+                }
+            }
+        }
         return sInstance;
     }
 
     public void init(Context context) {
         mContext = context;
         mObservers = new ArrayList<>();
-        mStorageVolume = new ArrayList<>(StorageUtils.getVolumes(context));
+        mStorageVolume = new ArrayList<>(StorageUtils.getVolumes(mContext));
         registerBroadcast();
     }
 
@@ -52,6 +60,9 @@ public class StorageVolumeProvider extends BroadcastReceiver {
     }
 
     public List<Volume> getStorageVolumes() {
+        if (null == mStorageVolume) {
+            mStorageVolume = new ArrayList<>(StorageUtils.getVolumes(mContext));
+        }
         return new ArrayList<>(mStorageVolume);
     }
 

@@ -41,4 +41,9 @@ public class MediaDocumentsProvider extends StorageProvider {
     public void onStorageVolumeChanged(List<Volume> newVolumes) {
 
     }
+
+    @Override
+    public boolean onCreate() {
+        return false;
+    }
 }
