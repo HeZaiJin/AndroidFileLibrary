@@ -229,7 +229,7 @@ public class ExternalStorageProvider extends StorageProvider {
                 row.add(Root.COLUMN_FLAGS, root.flags);
                 row.add(Root.COLUMN_TITLE, root.title);
                 row.add(Root.COLUMN_DOCUMENT_ID, root.docId);
-                row.add(Root.COLUMN_PATH, root.path);
+                row.add(Root.COLUMN_PATH, root.path.getAbsolutePath());
                 if (ROOT_ID_PRIMARY_EMULATED.equals(root.rootId)
                         || root.rootId.startsWith(ROOT_ID_SECONDARY)
                         || root.rootId.startsWith(ROOT_ID_PHONE)) {
@@ -237,6 +237,9 @@ public class ExternalStorageProvider extends StorageProvider {
                             ? Environment.getRootDirectory() : root.path;
                     row.add(Root.COLUMN_AVAILABLE_BYTES, file.getFreeSpace());
                     row.add(Root.COLUMN_CAPACITY_BYTES, file.getTotalSpace());
+                } else {
+                    row.add(Root.COLUMN_AVAILABLE_BYTES, -1);
+                    row.add(Root.COLUMN_CAPACITY_BYTES, -1);
                 }
             }
         }

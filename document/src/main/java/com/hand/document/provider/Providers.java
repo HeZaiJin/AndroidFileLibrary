@@ -1,19 +1,41 @@
 package com.hand.document.provider;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import com.hand.document.BuildConfig;
+import com.hand.document.core.RootInfo;
+import com.hand.document.io.IoUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Providers {
 
-    public static final int TYPE_ROOT_STORAGE = 1;
-    public static final int TYPE_ROOT_RECENT = 2;
-    public static final int TYPE_ROOT_IMAGE = 3;
-    public static final int TYPE_ROOT_VIDEO = 4;
-    public static final int TYPE_ROOT_AUDIO = 5;
-    public static final int TYPE_ROOT_DOWNLOAD = 6;
-    public static final int TYPE_ROOT_BLE = 7;
-    public static final int TYPE_ROOT_DOC = 8;
+    private static final Uri EXTERNAL_STORAGE_ROOT_URI = Uri.parse("content://" + BuildConfig.APPLICATION_ID + ".externalstorage.documents/root");
 
 
-    public static String getRootAuthority(int type) {
-
-        return null;
+    /**
+     * @param context
+     * @return
+     */
+    public static List<RootInfo> getLocalRoots(Context context) {
+        List<RootInfo> roots = new ArrayList<>();
+        Cursor query = context.getContentResolver().query(EXTERNAL_STORAGE_ROOT_URI, null, null, null, null);
+        if (null != query && !query.isClosed()) {
+            while (query.moveToNext()) {
+                RootInfo info = new RootInfo();
+                info.setRootId(query.getString(query.getColumnIndex(DocumentsContract.Root.COLUMN_ROOT_ID)));
+                info.setFlags(query.getInt(query.getColumnIndex(DocumentsContract.Root.COLUMN_FLAGS)));
+                info.setTitle(query.getString(query.getColumnIndex(DocumentsContract.Root.COLUMN_TITLE)));
+                info.setDocId(query.getString(query.getColumnIndex(DocumentsContract.Root.COLUMN_DOCUMENT_ID)));
+                info.setPath(query.getString(query.getColumnIndex(DocumentsContract.Root.COLUMN_PATH)));
+                info.setAvailableBytes(query.getLong(query.getColumnIndex(DocumentsContract.Root.COLUMN_AVAILABLE_BYTES)));
+                info.setCapacityBytes(query.getLong(query.getColumnIndex(DocumentsContract.Root.COLUMN_CAPACITY_BYTES)));
+                roots.add(info);
+            }
+            IoUtils.closeQuietly(query);
+        }
+        return roots;
     }
 }

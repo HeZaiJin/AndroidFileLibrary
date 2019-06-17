@@ -722,7 +722,7 @@ public abstract class DocumentsProvider extends ContentProvider {
                         String[] selectionArgs, String sortOrder, CancellationSignal cancellationSignal) {
         // As of Android-O, ContentProvider#query (w/ bundle arg) is the primary
         // transport method. We override that, and don't ever delegate to this metohd.
-        throw new UnsupportedOperationException("Pre-Android-O query format not supported.");
+        return query(uri, projection, selection, selectionArgs, sortOrder);
     }
 
     /**

@@ -10,6 +10,8 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.hand.document.core.RootInfo
+import com.hand.document.provider.Providers
 import com.hand.document.util.StorageUtils
 import com.hand.file.R
 
@@ -24,7 +26,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener { view ->
-            val volumes = StorageUtils.getVolumes(applicationContext)
+            var roots: List<RootInfo> = Providers.getLocalRoots(applicationContext)
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
