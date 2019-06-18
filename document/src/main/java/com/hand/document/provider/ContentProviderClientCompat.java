@@ -8,12 +8,14 @@ import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
+import android.text.format.DateUtils;
 import com.hand.document.util.BuildUtils;
 
 import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 
 public class ContentProviderClientCompat {
+    private static final long PROVIDER_ANR_TIMEOUT = 20 * DateUtils.SECOND_IN_MILLIS;
 
     //TODO NonSdkApiUsedViolation
     public static void setDetectNotResponding(ContentProviderClient client, long anrTimeout) {
@@ -31,6 +33,16 @@ public class ContentProviderClientCompat {
 
     public static ContentProviderClient acquireUnstableContentProviderClient(ContentResolver resolver, String authority) {
         return resolver.acquireContentProviderClient(authority);
+    }
+
+    public static ContentProviderClient acquireUnstableProviderOrThrow(
+            ContentResolver resolver, String authority) throws RemoteException {
+        final ContentProviderClient client = ContentProviderClientCompat.acquireUnstableContentProviderClient(resolver, authority);
+        if (client == null) {
+            throw new RemoteException("Failed to acquire provider for " + authority);
+        }
+        ContentProviderClientCompat.setDetectNotResponding(client, PROVIDER_ANR_TIMEOUT);
+        return client;
     }
 
     public static Bundle call(ContentResolver resolver, ContentProviderClient client, Uri uri, String method, String arg, Bundle extras) throws Exception {

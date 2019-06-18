@@ -17,4 +17,16 @@
     <!-- Size unit, displayed in a button next to an attachment  [CHAR LIMIT=5] -->
     <string name="gigabytes"><xliff:g id="count">%s</xliff:g> GB
     </string>
+    <!-- A string used to show user that currently documents are not sorted in any given order. [CHAR_LIMIT=30] -->
+    <string name="not_sorted">Not sorted</string>
+    <!-- Table header for file name [CHAR_LIMIT=24] -->
+    <string name="sort_dimension_name">Name</string>
+    <!-- Table header for metadata of downloaded files, such as download source and progress. [CHAR_LIMIT=24] -->
+    <string name="sort_dimension_summary">Summary</string>
+    <!-- Table header for file type. [CHAR_LIMIT=12] -->
+    <string name="sort_dimension_file_type">Type</string>
+    <!-- Table header for file size. [CHAR_LIMIT=12] -->
+    <string name="sort_dimension_size">Size</string>
+    <!-- Table header for last modified time. [CHAR_LIMIT=18] -->
+    <string name="sort_dimension_date">Modified</string>
 </resources>

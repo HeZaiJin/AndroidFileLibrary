@@ -7,16 +7,22 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.Loader
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.hand.document.core.DirectoryLoader
+import com.hand.document.core.DirectoryResult
 import com.hand.document.core.RootInfo
 import com.hand.document.provider.Providers
-import com.hand.document.util.StorageUtils
+import com.hand.document.util.LogUtil
 import com.hand.file.R
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
-
+    companion object {
+        var TAG = "MainActivity"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +33,22 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener { view ->
             var roots: List<RootInfo> = Providers.getLocalRoots(applicationContext)
+            var callback= object : LoaderManager.LoaderCallbacks<DirectoryResult> {
+
+                override fun onCreateLoader(id: Int, args: Bundle?): Loader<DirectoryResult> {
+                    return DirectoryLoader(this@MainActivity, roots[0], null)
+                }
+
+                override fun onLoadFinished(loader: Loader<DirectoryResult>, data: DirectoryResult?) {
+                    LogUtil.d(TAG,"onLoadFinished")
+                }
+
+                override fun onLoaderReset(loader: Loader<DirectoryResult>) {
+                    LogUtil.d(TAG,"onLoaderReset")
+                }
+
+            }
+            LoaderManager.getInstance(this@MainActivity).restartLoader(2, null, callback)
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
@@ -41,6 +63,38 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         toggle.syncState()
 
         navView.setNavigationItemSelectedListener(this)
+
+        var roots: List<RootInfo> = Providers.getLocalRoots(applicationContext)
+        var callback = object : LoaderManager.LoaderCallbacks<DirectoryResult> {
+
+            override fun onCreateLoader(id: Int, args: Bundle?): Loader<DirectoryResult> {
+                return DirectoryLoader(this@MainActivity, roots[0], null)
+            }
+
+            override fun onLoadFinished(loader: Loader<DirectoryResult>, data: DirectoryResult?) {
+                LogUtil.d(TAG,"onLoadFinished")
+            }
+
+            override fun onLoaderReset(loader: Loader<DirectoryResult>) {
+                LogUtil.d(TAG,"onLoaderReset")
+            }
+
+        }
+        LoaderManager.getInstance(this@MainActivity).initLoader(2, null, object : LoaderManager.LoaderCallbacks<DirectoryResult> {
+
+            override fun onCreateLoader(id: Int, args: Bundle?): Loader<DirectoryResult> {
+                return DirectoryLoader(this@MainActivity, roots[0], null)
+            }
+
+            override fun onLoadFinished(loader: Loader<DirectoryResult>, data: DirectoryResult?) {
+                LogUtil.d(TAG,"onLoadFinished")
+            }
+
+            override fun onLoaderReset(loader: Loader<DirectoryResult>) {
+                LogUtil.d(TAG,"onLoaderReset")
+            }
+
+        })
     }
 
     override fun onBackPressed() {

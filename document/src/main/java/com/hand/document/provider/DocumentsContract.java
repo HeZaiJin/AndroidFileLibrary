@@ -314,6 +314,17 @@ public final class DocumentsContract {
          * @see DocumentsProvider#openDocumentThumbnail(String, Point,
          * android.os.CancellationSignal)
          */
+
+        /**
+         * MIME type of a apk file
+         *
+         * @see #COLUMN_MIME_TYPE
+         */
+        public static final String MIME_TYPE_APK = "application/vnd.android.package-archive";
+
+        public static final String MIME_TYPE_HIDDEN = "vnd.android.document/hidden";
+
+
         public static final int FLAG_SUPPORTS_THUMBNAIL = 1;
 
         /**

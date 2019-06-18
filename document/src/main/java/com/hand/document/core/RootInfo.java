@@ -6,6 +6,7 @@ import android.os.Parcelable;
 public class RootInfo implements Parcelable {
 
     private String rootId;
+    private String authority;
     private int flags;
     private String title;
     private String docId;
@@ -18,6 +19,7 @@ public class RootInfo implements Parcelable {
 
     protected RootInfo(Parcel in) {
         rootId = in.readString();
+        authority = in.readString();
         flags = in.readInt();
         title = in.readString();
         docId = in.readString();
@@ -99,9 +101,18 @@ public class RootInfo implements Parcelable {
         this.capacity_bytes = capacity_bytes;
     }
 
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.rootId);
+        dest.writeString(this.authority);
         dest.writeInt(this.flags);
         dest.writeString(this.title);
         dest.writeString(this.docId);
