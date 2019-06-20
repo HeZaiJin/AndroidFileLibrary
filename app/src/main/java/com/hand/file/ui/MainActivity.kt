@@ -1,5 +1,6 @@
 package com.hand.file.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -31,26 +32,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         setSupportActionBar(toolbar)
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
-            var roots: List<RootInfo> = Providers.getLocalRoots(applicationContext)
-            var callback= object : LoaderManager.LoaderCallbacks<DirectoryResult> {
-
-                override fun onCreateLoader(id: Int, args: Bundle?): Loader<DirectoryResult> {
-                    return DirectoryLoader(this@MainActivity, roots[0], null)
-                }
-
-                override fun onLoadFinished(loader: Loader<DirectoryResult>, data: DirectoryResult?) {
-                    LogUtil.d(TAG,"onLoadFinished")
-                }
-
-                override fun onLoaderReset(loader: Loader<DirectoryResult>) {
-                    LogUtil.d(TAG,"onLoaderReset")
-                }
-
-            }
-            LoaderManager.getInstance(this@MainActivity).restartLoader(2, null, callback)
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        fab.setOnClickListener {
+            startActivity(Intent(this@MainActivity, DocumentActivity::class.java))
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)

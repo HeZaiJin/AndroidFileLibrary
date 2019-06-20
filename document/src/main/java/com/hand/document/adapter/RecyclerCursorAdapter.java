@@ -1,0 +1,38 @@
+package com.hand.document.adapter;
+
+import android.database.Cursor;
+import androidx.annotation.NonNull;
+
+public abstract class RecyclerCursorAdapter<T, VH extends BaseHolder<T>> extends MultiChoiceAdapter<VH> {
+
+    private Cursor mCursor;
+    private int mCursorCount;
+
+    public void swapResult(Cursor cursor) {
+        mCursor = cursor;
+        mCursorCount = mCursor != null ? mCursor.getCount() : 0;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        return mCursorCount;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull VH holder, int position) {
+        super.onBindViewHolder(holder, position);
+        holder.setData(getItem(position));
+    }
+
+    public T getItem(int position) {
+        if (position < mCursorCount) {
+            mCursor.moveToPosition(position);
+            return obtainItem(mCursor);
+        } else {
+            return null;
+        }
+    }
+
+    public abstract T obtainItem(Cursor cursor);
+}

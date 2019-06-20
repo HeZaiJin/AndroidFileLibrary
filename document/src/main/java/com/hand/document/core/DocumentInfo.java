@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import com.hand.document.core.cursor.RootCursorWrapper;
 import com.hand.document.io.IoUtils;
 import com.hand.document.provider.ContentProviderClientCompat;
 import com.hand.document.provider.DocumentsContract;
@@ -149,10 +150,10 @@ public class DocumentInfo implements Durable, Parcelable {
         }
     };
 
-/*    public static DocumentInfo fromDirectoryCursor(Cursor cursor) {
+    public static DocumentInfo fromDirectoryCursor(Cursor cursor) {
         final String authority = getCursorString(cursor, RootCursorWrapper.COLUMN_AUTHORITY);
         return fromCursor(cursor, authority);
-    }*/
+    }
 
     public static DocumentInfo fromCursor(Cursor cursor, String authority) {
         final DocumentInfo info = new DocumentInfo();

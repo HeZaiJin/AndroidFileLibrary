@@ -32,7 +32,7 @@ public class Providers {
                 info.setPath(query.getString(query.getColumnIndex(DocumentsContract.Root.COLUMN_PATH)));
                 info.setAvailableBytes(query.getLong(query.getColumnIndex(DocumentsContract.Root.COLUMN_AVAILABLE_BYTES)));
                 info.setCapacityBytes(query.getLong(query.getColumnIndex(DocumentsContract.Root.COLUMN_CAPACITY_BYTES)));
-                info.setAuthority(query.getString(query.getColumnIndex(DocumentsContract.Root.C)));
+                info.setAuthority(ExternalStorageProvider.AUTHORITY);
                 roots.add(info);
             }
             IoUtils.closeQuietly(query);

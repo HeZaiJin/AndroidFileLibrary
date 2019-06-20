@@ -17,6 +17,10 @@ buildscript {
 
 allprojects {
     repositories {
+        //阿里云maven,解决google访问速度偏慢问题
+        maven {
+            url 'https://maven.aliyun.com/repository/google'
+        }
         google()
         jcenter()
 
