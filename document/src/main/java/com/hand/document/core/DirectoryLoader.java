@@ -52,7 +52,7 @@ public class DirectoryLoader extends AsyncTaskLoader<DirectoryResult> {
         }
         final DirectoryResult result = new DirectoryResult();
         final ContentResolver resolver = getContext().getContentResolver();
-        if (null == mDoc) {
+        if (null == mDoc || mDoc.isRootDirectory()) {
             final Uri docUri = DocumentsContract.buildDocumentUri(
                     mRootInfo.getAuthority(), mRootInfo.getDocId());
             try {

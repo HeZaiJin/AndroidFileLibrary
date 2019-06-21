@@ -3,7 +3,14 @@ package com.hand.document.core;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class RootInfo implements Parcelable {
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ProtocolException;
+
+public class RootInfo implements Parcelable, Durable {
+
+    private static final int VERSION_DROP_TYPE = 1;
 
     private String rootId;
     private String authority;
@@ -119,5 +126,50 @@ public class RootInfo implements Parcelable {
         dest.writeString(this.path);
         dest.writeLong(this.available_bytes);
         dest.writeLong(this.capacity_bytes);
+    }
+
+    @Override
+    public void reset() {
+        rootId = null;
+        authority = null;
+        flags = -1;
+        title = null;
+        docId = null;
+        path = null;
+        available_bytes = -1;
+        capacity_bytes = -1;
+    }
+
+    @Override
+    public void read(DataInputStream in) throws IOException {
+        final int version = in.readInt();
+        switch (version) {
+            case VERSION_DROP_TYPE:
+                rootId = DurableUtils.readNullableString(in);
+                authority = DurableUtils.readNullableString(in);
+                flags = in.readInt();
+                title = DurableUtils.readNullableString(in);
+                docId = DurableUtils.readNullableString(in);
+                path = DurableUtils.readNullableString(in);
+                available_bytes = in.readLong();
+                available_bytes = in.readLong();
+                capacity_bytes = in.readLong();
+                break;
+            default:
+                throw new ProtocolException("Unknown version " + version);
+        }
+    }
+
+    @Override
+    public void write(DataOutputStream out) throws IOException {
+        out.writeInt(VERSION_DROP_TYPE);
+        DurableUtils.writeNullableString(out, rootId);
+        DurableUtils.writeNullableString(out, authority);
+        out.writeInt(flags);
+        DurableUtils.writeNullableString(out, title);
+        DurableUtils.writeNullableString(out, docId);
+        DurableUtils.writeNullableString(out, path);
+        out.writeLong(available_bytes);
+        out.writeLong(capacity_bytes);
     }
 }

@@ -61,6 +61,7 @@ public class DocumentInfo implements Durable, Parcelable {
     public long size;
     public int icon;
     public String path;
+    public boolean rootDirectory;
 
     /**
      * Derived fields that aren't persisted
@@ -69,6 +70,11 @@ public class DocumentInfo implements Durable, Parcelable {
 
     public DocumentInfo() {
         reset();
+    }
+
+    public DocumentInfo(boolean rootDirectory) {
+        reset();
+        this.rootDirectory = rootDirectory;
     }
 
     @Override
@@ -83,8 +89,8 @@ public class DocumentInfo implements Durable, Parcelable {
         size = -1;
         icon = 0;
         path = null;
-
         derivedUri = null;
+        this.rootDirectory = false;
     }
 
     @Override
@@ -104,6 +110,7 @@ public class DocumentInfo implements Durable, Parcelable {
                 size = in.readLong();
                 icon = in.readInt();
                 path = DurableUtils.readNullableString(in);
+                rootDirectory = in.readBoolean();
                 deriveFields();
                 break;
             default:
@@ -124,6 +131,7 @@ public class DocumentInfo implements Durable, Parcelable {
         out.writeLong(size);
         out.writeInt(icon);
         DurableUtils.writeNullableString(out, path);
+        out.writeBoolean(rootDirectory);
     }
 
     @Override
@@ -218,6 +226,10 @@ public class DocumentInfo implements Durable, Parcelable {
     @Override
     public String toString() {
         return "Document{docId=" + documentId + ", name=" + displayName + "}";
+    }
+
+    public boolean isRootDirectory() {
+        return rootDirectory;
     }
 
     public boolean isCreateSupported() {

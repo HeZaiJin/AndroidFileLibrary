@@ -18,6 +18,10 @@ import com.hand.document.core.RootInfo
 import com.hand.document.util.LogUtil
 import com.hand.file.R
 
+
+/**
+ * TODO save FragmentState
+ */
 class DocumentFragment : Fragment() {
 
     companion object {
@@ -86,7 +90,7 @@ class DocumentFragment : Fragment() {
         //test code
         adapter!!.setItemClickListener { view, position ->
             run {
-                (activity as DocumentActivity).openDirectory(rootInfo!!, adapter!!.getItem(position))
+                (activity as DocumentActivity).openDirectory(rootInfo!!, adapter!!.getItem(position), false)
             }
         }
     }

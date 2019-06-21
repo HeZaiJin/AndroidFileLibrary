@@ -6,6 +6,9 @@ import com.hand.document.adapter.BaseHolder
 import com.hand.document.core.DocumentInfo
 import com.hand.file.R
 
+/**
+ * TODO MD UI
+ */
 class DocHolder(itemView: View) : BaseHolder<DocumentInfo>(itemView) {
 
     private var title: TextView = itemView.findViewById(R.id.title)
