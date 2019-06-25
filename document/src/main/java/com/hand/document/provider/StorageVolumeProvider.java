@@ -1,13 +1,20 @@
 package com.hand.document.provider;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import androidx.annotation.RequiresPermission;
 import com.hand.document.io.Volume;
+import com.hand.document.util.BuildUtils;
 import com.hand.document.util.LogUtil;
 import com.hand.document.util.StorageUtils;
+import com.hand.document.util.Utils;
 
+import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +48,7 @@ public class StorageVolumeProvider extends BroadcastReceiver {
     public void init(Context context) {
         mContext = context;
         mObservers = new ArrayList<>();
-        mStorageVolume = new ArrayList<>(StorageUtils.getVolumes(mContext));
+        getStorageVolumes();
         registerBroadcast();
     }
 
@@ -61,7 +68,15 @@ public class StorageVolumeProvider extends BroadcastReceiver {
 
     public List<Volume> getStorageVolumes() {
         if (null == mStorageVolume) {
-            mStorageVolume = new ArrayList<>(StorageUtils.getVolumes(mContext));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (mContext.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                        || mContext.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    //permission not granted
+                    return new ArrayList<>();
+                } else {
+                    mStorageVolume = new ArrayList<>(StorageUtils.getVolumes(mContext));
+                }
+            }
         }
         return new ArrayList<>(mStorageVolume);
     }

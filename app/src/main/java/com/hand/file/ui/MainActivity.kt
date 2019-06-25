@@ -46,38 +46,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         toggle.syncState()
 
         navView.setNavigationItemSelectedListener(this)
-
-        var roots: List<RootInfo> = Providers.getLocalRoots(applicationContext)
-        var callback = object : LoaderManager.LoaderCallbacks<DirectoryResult> {
-
-            override fun onCreateLoader(id: Int, args: Bundle?): Loader<DirectoryResult> {
-                return DirectoryLoader(this@MainActivity, roots[0], null)
-            }
-
-            override fun onLoadFinished(loader: Loader<DirectoryResult>, data: DirectoryResult?) {
-                LogUtil.d(TAG,"onLoadFinished")
-            }
-
-            override fun onLoaderReset(loader: Loader<DirectoryResult>) {
-                LogUtil.d(TAG,"onLoaderReset")
-            }
-
-        }
-        LoaderManager.getInstance(this@MainActivity).initLoader(2, null, object : LoaderManager.LoaderCallbacks<DirectoryResult> {
-
-            override fun onCreateLoader(id: Int, args: Bundle?): Loader<DirectoryResult> {
-                return DirectoryLoader(this@MainActivity, roots[0], null)
-            }
-
-            override fun onLoadFinished(loader: Loader<DirectoryResult>, data: DirectoryResult?) {
-                LogUtil.d(TAG,"onLoadFinished")
-            }
-
-            override fun onLoaderReset(loader: Loader<DirectoryResult>) {
-                LogUtil.d(TAG,"onLoaderReset")
-            }
-
-        })
     }
 
     override fun onBackPressed() {

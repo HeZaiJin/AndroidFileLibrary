@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.Loader
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hand.document.core.DirectoryLoader
@@ -17,6 +16,7 @@ import com.hand.document.core.DocumentInfo
 import com.hand.document.core.RootInfo
 import com.hand.document.util.LogUtil
 import com.hand.file.R
+import com.hand.file.ui.widget.DividerItemDecoration
 
 
 /**
@@ -54,7 +54,9 @@ class DocumentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = view.findViewById(R.id.list)
         recyclerView!!.layoutManager = LinearLayoutManager(context)
-        recyclerView!!.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+        decoration.setInset(resources.getDimensionPixelSize(R.dimen.list_divider_inset_space), 0)
+        recyclerView!!.addItemDecoration(decoration)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

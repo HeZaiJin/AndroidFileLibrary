@@ -5,16 +5,17 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:orientation="vertical"
         android:foreground="?selectableItemBackground"
+        android:focusable="true"
+        android:background="@drawable/item_doc_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/list_item_height"
-        android:paddingLeft="@dimen/list_item_padding"
-        android:paddingRight="@dimen/list_item_padding"
-        android:paddingStart="@dimen/list_item_padding">
+        android:layout_height="@dimen/list_item_height"
+        android:padding="@dimen/list_item_padding">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/image"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_width="@dimen/list_item_image_height"
+            android:layout_height="@dimen/list_item_image_height"
+            android:scaleType="center"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:src="@drawable/ic_root_documents"
@@ -23,7 +24,6 @@
     <TextView
             android:id="@+id/title"
             tools:text="Title"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="@dimen/list_item_padding"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/image"
@@ -32,15 +32,15 @@
             android:ellipsize="middle"
             android:layout_height="wrap_content"
             android:textAlignment="viewStart"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+            android:textSize="@dimen/list_item_title_size"
             android:textColor="?android:attr/textColorPrimary"/>
 
     <TextView
             tools:text="Desc"
             android:id="@+id/desc"
-            android:layout_marginBottom="10dp"
             android:layout_marginStart="@dimen/list_item_padding"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/image"
             android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
             android:singleLine="true"
             android:ellipsize="end"
             android:textAlignment="viewStart"
+            android:textSize="@dimen/list_item_summary_size"
             android:textColor="?android:attr/textColorSecondary"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

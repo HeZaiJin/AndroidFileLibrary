@@ -1,9 +1,11 @@
 package com.hand.document.util;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import androidx.annotation.RequiresPermission;
 import com.hand.document.io.Volume;
 
 import java.io.File;
@@ -17,6 +19,7 @@ public class StorageUtils {
 
     public static final String PATH_EMULATED = "storage/emulated/0";
 
+    @RequiresPermission(allOf = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
     @SuppressLint("NewApi")
     public static List<Volume> getVolumes(Context context) {
         List<Volume> currentVolumes = new ArrayList<>();

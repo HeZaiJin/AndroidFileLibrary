@@ -44,7 +44,6 @@ public class ExternalStorageProvider extends StorageProvider {
         public boolean reportAvailableBytes;
     }
 
-
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".externalstorage.documents";
 
     public static final String ROOT_ID_PRIMARY_EMULATED = "primary";
@@ -219,9 +218,16 @@ public class ExternalStorageProvider extends StorageProvider {
         return mostSpecificRoot;
     }
 
+    private void enforceRoots() {
+        if (mRoots.isEmpty()) {
+            updateRoots();
+        }
+    }
+
     @Override
     public Cursor queryRoots(String[] projection) throws FileNotFoundException {
         final MatrixCursor result = new MatrixCursor(resolveRootProjection(projection));
+        enforceRoots();
         synchronized (mRootsLock) {
             for (RootInfo root : mRoots.values()) {
                 final MatrixCursor.RowBuilder row = result.newRow();
