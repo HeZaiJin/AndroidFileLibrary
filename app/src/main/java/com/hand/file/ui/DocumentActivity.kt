@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.hand.document.core.DocumentInfo
 import com.hand.document.core.DocumentState
 import com.hand.document.core.RootInfo
@@ -28,11 +29,14 @@ class DocumentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_document)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener { onBackPressed() }
         this.rootInfo = Providers.getLocalRoots(applicationContext)!![0]
         onCurrentDirecotryChanged()
     }
 
-    fun openDirectory(rootInfo: RootInfo, documentInfo: DocumentInfo?, back : Boolean) {
+    fun openDirectory(rootInfo: RootInfo, documentInfo: DocumentInfo?, back: Boolean) {
         Log.d(TAG, "openDirectory rootInfo $rootInfo, documentInfo $documentInfo")
 
         if (!back && null != documentInfo) {
