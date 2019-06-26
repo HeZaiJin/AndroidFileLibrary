@@ -18,8 +18,9 @@
                 android:layout_width="match_parent"
                 app:layout_scrollFlags="scroll|enterAlways"
                 android:layout_height="?attr/actionBarSize"
-                app:navigationIcon="@drawable/bar_arrow_back"
                 android:background="?attr/colorPrimary"
+                app:navigationIcon="@drawable/ic_menu"
+                android:theme="@style/ThemeOverlay.AppCompat.Light"
                 app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
     </com.google.android.material.appbar.AppBarLayout>
