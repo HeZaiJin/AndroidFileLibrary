@@ -21,6 +21,8 @@ public abstract class MultiChoiceAdapter<VH extends BaseHolder> extends BaseRecy
     public void onBindViewHolder(@NonNull VH holder, int position) {
         super.onBindViewHolder(holder, position);
         updateCheckedState(holder.itemView, position);
+        holder.setEditState(isEditing());
+        holder.setItemChecked(mMultiChoiceHelper.isItemChecked(position));
     }
 
     public void setMultiChoiceListener(MultiChoiceHelper.MultiChoiceListener listener) {
@@ -59,12 +61,13 @@ public abstract class MultiChoiceAdapter<VH extends BaseHolder> extends BaseRecy
         int position = getAdapterPosition(v);
         if (position != NO_POSITION) {
             mMultiChoiceHelper.setItemChecked(position, true, true);
+            notifyDataSetChanged();
             return true;
         }
         return false;
     }
 
-    void updateCheckedState(View view, int position) {
+   public void updateCheckedState(View view, int position) {
         final boolean isChecked = mMultiChoiceHelper.isItemChecked(position);
         if (view instanceof Checkable) {
             ((Checkable) view).setChecked(isChecked);

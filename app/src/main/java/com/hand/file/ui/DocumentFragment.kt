@@ -1,6 +1,7 @@
 package com.hand.file.ui
 
 import android.os.Bundle
+import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.loader.app.LoaderManager
 import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hand.document.adapter.MultiChoiceHelper
 import com.hand.document.core.DirectoryLoader
 import com.hand.document.core.DirectoryResult
 import com.hand.document.core.DocumentInfo
@@ -22,7 +24,8 @@ import com.hand.file.ui.widget.DividerItemDecoration
 /**
  * TODO save FragmentState
  */
-class DocumentFragment : Fragment() {
+class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener {
+
 
     companion object {
         var TAG = "DocumentFragment"
@@ -48,7 +51,8 @@ class DocumentFragment : Fragment() {
     private var adapter: DocAdapter? = null
     private var rootInfo: RootInfo? = null
     private var documentInfo: DocumentInfo? = null
-
+    private var actionModeCallback: DocumentActionMode? = null
+    private var actionMode: ActionMode? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -80,6 +84,7 @@ class DocumentFragment : Fragment() {
 
             override fun onLoadFinished(loader: Loader<DirectoryResult>, data: DirectoryResult?) {
                 adapter!!.swapResult(data!!.cursor)
+                restoreDisplayState()
                 LogUtil.d(MainActivity.TAG, "onLoadFinished")
             }
 
@@ -95,5 +100,40 @@ class DocumentFragment : Fragment() {
                 (activity as DocumentActivity).openDirectory(rootInfo!!, adapter!!.getItem(position), false)
             }
         }
+        adapter!!.setMultiChoiceListener(this)
+    }
+
+    fun getActionModeCallback(): DocumentActionMode {
+        if (null == actionModeCallback) {
+            actionModeCallback = DocumentActionMode(rootInfo!!, documentInfo!!)
+        }
+        return actionModeCallback!!
+    }
+
+    override fun onItemCheckedStateChanged(position: Int, checked: Boolean) {
+
+    }
+
+    override fun onEditingStateChanged(edit: Boolean) {
+        /*if (edit) {
+            actionMode = activity!!.startActionMode(getActionModeCallback())
+        } else if (null != actionMode) {
+            actionMode!!.finish()
+        }*/
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (activity as DocumentActivity).saveDisplayState(getDisplayStateKey(), view!!)
+    }
+
+    private fun restoreDisplayState() {
+        if (null != this@DocumentFragment.view) {
+            (activity as DocumentActivity).restoreDisplayState(getDisplayStateKey(), this@DocumentFragment.view!!)
+        }
+    }
+
+    private fun getDisplayStateKey(): String {
+        return rootInfo!!.rootId + ":" + documentInfo!!.documentId
     }
 }

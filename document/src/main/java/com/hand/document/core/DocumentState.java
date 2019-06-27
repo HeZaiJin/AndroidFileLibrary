@@ -2,12 +2,18 @@ package com.hand.document.core;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.ArrayMap;
+import android.util.SparseArray;
 
 public class DocumentState implements Parcelable {
 
     public DocumentStack mStack = new DocumentStack();
+    public RootInfo mRoot;
 
-    public DocumentState() {
+    public ArrayMap<String, SparseArray<Parcelable>> mDisplayState = new ArrayMap<>();
+
+    public DocumentState(RootInfo info) {
+        mRoot = info;
     }
 
     protected DocumentState(Parcel in) {
@@ -52,5 +58,13 @@ public class DocumentState implements Parcelable {
 
     public void clearStack() {
         mStack.clear();
+    }
+
+    public void saveDisplayState(String key, SparseArray<Parcelable> parcelable) {
+        mDisplayState.put(key, parcelable);
+    }
+
+    public SparseArray<Parcelable> getDisplayState(String key) {
+        return mDisplayState.remove(key);
     }
 }

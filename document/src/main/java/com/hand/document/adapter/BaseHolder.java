@@ -11,4 +11,7 @@ public abstract class BaseHolder<T> extends RecyclerView.ViewHolder {
 
     public abstract void setData(T data);
 
+    public abstract void setEditState(boolean editing);
+
+    public abstract void setItemChecked(boolean checked);
 }

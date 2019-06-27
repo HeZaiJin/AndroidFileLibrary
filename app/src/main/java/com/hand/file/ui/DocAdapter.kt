@@ -18,4 +18,5 @@ class DocAdapter(layout: Int) : DocumentAdapter<DocHolder>() {
     override fun onBindViewHolder(holder: DocHolder, position: Int) {
         super.onBindViewHolder(holder, position)
     }
+
 }
