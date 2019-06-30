@@ -29,4 +29,7 @@
     <string name="sort_dimension_size">Size</string>
     <!-- Table header for last modified time. [CHAR_LIMIT=18] -->
     <string name="sort_dimension_date">Modified</string>
+    <string name="menu_select_all">Select All</string>
+    <string name="menu_select_un_all">UnSelect All</string>
+
 </resources>

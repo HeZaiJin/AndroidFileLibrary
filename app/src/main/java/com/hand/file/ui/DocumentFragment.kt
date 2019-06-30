@@ -2,6 +2,7 @@ package com.hand.file.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ActionMode
@@ -18,7 +19,6 @@ import com.hand.document.core.DocumentInfo
 import com.hand.document.core.RootInfo
 import com.hand.document.util.LogUtil
 import com.hand.file.R
-import com.hand.file.ui.widget.DividerItemDecoration
 
 
 /**
@@ -123,6 +123,10 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
         }
     }
 
+    override fun onSelectAll(selectAll: Boolean) {
+        actionModeCallback?.updateSelectAll(selectAll)
+    }
+
     override fun onActionModeDestroy() {
         (activity as DocumentActivity).updateStatusBarColor(resources.getColor(R.color.white), true)
         if (adapter!!.isEditing) {
@@ -134,6 +138,42 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
         (activity as DocumentActivity).updateStatusBarColor(resources.getColor(R.color.blue), false)
     }
 
+    private fun selectAll(selectAll: Boolean) {
+        adapter?.selectAll(selectAll)
+    }
+
+    override fun onActionMenuClick(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_select_all -> {
+                var selectAll = adapter!!.isSelectAll
+                selectAll(!selectAll)
+                actionModeCallback?.updateSelectAll(!selectAll)
+                return false
+            }
+            R.id.menu_delete -> {
+                return true
+            }
+            R.id.menu_copy -> {
+                return true
+            }
+            R.id.menu_cut -> {
+                return true
+            }
+            R.id.menu_info -> {
+                return true
+            }
+            R.id.menu_rename -> {
+                return true
+            }
+            R.id.menu_share -> {
+                return true
+            }
+            R.id.menu_compress -> {
+                return true
+            }
+        }
+        return false
+    }
 
     override fun onPause() {
         super.onPause()

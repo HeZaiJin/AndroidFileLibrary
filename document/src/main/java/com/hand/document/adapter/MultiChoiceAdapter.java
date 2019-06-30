@@ -57,6 +57,14 @@ public abstract class MultiChoiceAdapter<VH extends BaseHolder> extends BaseRecy
         }
     }
 
+    public void selectAll(boolean selectAll) {
+        mMultiChoiceHelper.setSelectAll(selectAll);
+    }
+
+    public boolean isSelectAll() {
+        return mMultiChoiceHelper.isSelectAll();
+    }
+
     @Override
     public boolean onLongClick(View v) {
         if (isEditing()) {
@@ -71,7 +79,7 @@ public abstract class MultiChoiceAdapter<VH extends BaseHolder> extends BaseRecy
         return false;
     }
 
-   public void updateCheckedState(View view, int position) {
+    public void updateCheckedState(View view, int position) {
         final boolean isChecked = mMultiChoiceHelper.isItemChecked(position);
         if (view instanceof Checkable) {
             ((Checkable) view).setChecked(isChecked);

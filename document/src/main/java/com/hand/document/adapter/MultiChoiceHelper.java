@@ -11,6 +11,10 @@ public class MultiChoiceHelper {
 
     private static final String TAG = "MultiChoiceHelper";
 
+    private static final int SELECT_NORMAL = 0;
+    private static final int SELECT_ALL = 1;
+    private static final int SELECT_NONE = 2;
+
     public interface MultiChoiceListener {
         /**
          * Called when an item is checked or unchecked during selection mode.
@@ -26,6 +30,8 @@ public class MultiChoiceHelper {
         void onItemCheckedStateChanged(int position, boolean checked);
 
         void onEditingStateChanged(boolean edit);
+
+        void onSelectAll(boolean selectAll);
     }
 
     private final RecyclerView.Adapter mAdapter;
@@ -33,6 +39,7 @@ public class MultiChoiceHelper {
     private int mCheckedItemCount = 0;
     private MultiChoiceListener mListener;
     private boolean isEditing = false;
+    private int mSelectMode = SELECT_NORMAL;
 
     public MultiChoiceHelper(@NonNull RecyclerView.Adapter adapter) {
         this.mAdapter = adapter;
@@ -61,6 +68,7 @@ public class MultiChoiceHelper {
     }
 
     public void clearChoices() {
+        mSelectMode = SELECT_NORMAL;
         if (mCheckedItemCount > 0) {
             final int start = mCheckStates.keyAt(0);
             final int end = mCheckStates.keyAt(mCheckStates.size() - 1);
@@ -76,8 +84,34 @@ public class MultiChoiceHelper {
         }
     }
 
-    public void setItemChecked(int position, boolean value, boolean notifyChanged) {
+    public void setSelectAll(boolean selectAll) {
+        int mode = selectAll ? SELECT_ALL : SELECT_NONE;
+        if (mode != mSelectMode) {
+            mSelectMode = mode;
+            if (mode == SELECT_NONE) {
+                clearChoices();
+            } else if (mode == SELECT_ALL) {
+                mCheckedItemCount = mAdapter.getItemCount();
+                //need approve
+                for (int i = 0; i < mCheckedItemCount; i++) {
+                    mCheckStates.put(i, true);
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    }
 
+    public boolean isSelectAll() {
+        return mSelectMode == SELECT_ALL;
+    }
+
+    public void setItemChecked(int position, boolean value, boolean notifyChanged) {
+        if (isSelectAll() && !value) {
+            mSelectMode = SELECT_NORMAL;
+            if (null != mListener) {
+                mListener.onSelectAll(false);
+            }
+        }
         boolean oldValue = mCheckStates.get(position);
         mCheckStates.put(position, value);
         if (oldValue != value) {
@@ -106,6 +140,12 @@ public class MultiChoiceHelper {
                 }
                 if (null != mListener) {
                     mListener.onItemCheckedStateChanged(position, value);
+                }
+            }
+            if (mCheckedItemCount >= mAdapter.getItemCount()) {
+                mSelectMode = SELECT_ALL;
+                if (null != mListener) {
+                    mListener.onSelectAll(true);
                 }
             }
         }
