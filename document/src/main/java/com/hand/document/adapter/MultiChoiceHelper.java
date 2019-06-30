@@ -100,12 +100,13 @@ public class MultiChoiceHelper {
                     mListener.onEditingStateChanged(false);
                 }
             }
-
-            if (notifyChanged) {
-                mAdapter.notifyItemChanged(position);
-            }
-            if (null != mListener) {
-                mListener.onItemCheckedStateChanged(position, value);
+            if (mCheckedItemCount > 0) {
+                if (notifyChanged) {
+                    mAdapter.notifyItemChanged(position);
+                }
+                if (null != mListener) {
+                    mListener.onItemCheckedStateChanged(position, value);
+                }
             }
         }
     }

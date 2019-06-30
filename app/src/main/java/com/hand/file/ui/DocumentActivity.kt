@@ -39,7 +39,7 @@ class DocumentActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         toolbar!!.setNavigationOnClickListener { onBackPressed() }
-        this.rootInfo = Providers.getLocalRoots(applicationContext)!![1]
+        this.rootInfo = Providers.getLocalRoots(applicationContext)!![0]
         state = DocumentState(rootInfo)
         onCurrentDirecotryChanged()
     }
