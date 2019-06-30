@@ -1,6 +1,7 @@
 package com.hand.file.ui
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
@@ -12,8 +13,9 @@ import com.hand.document.core.DocumentInfo
 import com.hand.document.core.DocumentState
 import com.hand.document.core.RootInfo
 import com.hand.document.provider.Providers
-import com.hand.document.util.LogUtil
+import com.hand.document.util.BuildUtils
 import com.hand.file.R
+
 
 /**
  * TODO Document Stack
@@ -37,7 +39,7 @@ class DocumentActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         toolbar!!.setNavigationOnClickListener { onBackPressed() }
-        this.rootInfo = Providers.getLocalRoots(applicationContext)!![0]
+        this.rootInfo = Providers.getLocalRoots(applicationContext)!![1]
         state = DocumentState(rootInfo)
         onCurrentDirecotryChanged()
     }
@@ -82,6 +84,18 @@ class DocumentActivity : AppCompatActivity() {
         openDirectory(rootInfo!!, documentInfo, false)
     }
 
+    fun updateStatusBarColor(color: Int, light: Boolean) {
+        if (BuildUtils.hasLollipop()) {
+            window.statusBarColor = color
+            val systemUiVisibility = window.decorView.systemUiVisibility
+            if (light) {
+                window.decorView.systemUiVisibility =  (systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
+            } else {
+                window.decorView.systemUiVisibility =  (systemUiVisibility xor View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
+            }
+        }
+//        toolbar?.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+    }
 
     override fun onBackPressed() {
         if (state!!.stackSize > 0) {

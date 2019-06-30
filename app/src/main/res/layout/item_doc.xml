@@ -9,7 +9,8 @@
         android:background="@drawable/item_doc_background"
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_item_height"
-        android:padding="@dimen/list_item_padding">
+        android:paddingStart="@dimen/list_item_padding"
+        android:paddingTop="@dimen/list_item_padding">
 
     <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/image"
@@ -17,12 +18,14 @@
             android:layout_height="@dimen/list_item_image_height"
             android:scaleType="center"
             app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="@dimen/list_item_padding"
             app:layout_constraintTop_toTopOf="parent"
             android:src="@drawable/ic_root_documents"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
             android:id="@+id/title"
+            android:layout_marginEnd="@dimen/list_item_padding"
             tools:text="Title"
             android:layout_marginStart="@dimen/list_item_padding"
             app:layout_constraintTop_toTopOf="parent"
@@ -37,6 +40,7 @@
             android:textColor="?android:attr/textColorPrimary"/>
 
     <TextView
+            android:layout_marginEnd="@dimen/list_item_padding"
             tools:text="Desc"
             android:id="@+id/desc"
             android:layout_marginStart="@dimen/list_item_padding"
@@ -49,16 +53,26 @@
             android:ellipsize="end"
             android:textAlignment="viewStart"
             android:textSize="@dimen/list_item_summary_size"
+            android:layout_marginBottom="@dimen/list_item_padding"
             android:textColor="?android:attr/textColorSecondary"/>
 
-    <CheckBox
+    <androidx.appcompat.widget.AppCompatCheckBox
+            android:layout_marginEnd="@dimen/list_item_padding"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="@dimen/list_item_padding"
             app:layout_constraintEnd_toEndOf="parent"
             android:clickable="false"
             android:visibility="invisible"
             android:id="@+id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
+    <View
+            app:layout_constraintStart_toStartOf="@id/title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="#e8eaed"
+            android:layout_width="0dp" android:layout_height="1dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

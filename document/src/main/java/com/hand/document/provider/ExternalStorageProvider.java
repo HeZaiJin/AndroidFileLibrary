@@ -101,7 +101,7 @@ public class ExternalStorageProvider extends StorageProvider {
             List<Volume> storageVolumes = getStorageVolumes();
             for (Volume volume : storageVolumes) {
                 final File path = new File(volume.path);
-                String state = EnvironmentCompat.getStorageState(path);
+                String state = volume.state;
                 final boolean mounted = Environment.MEDIA_MOUNTED.equals(state)
                         || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
                 if (!mounted) continue;

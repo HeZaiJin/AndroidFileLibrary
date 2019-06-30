@@ -11,6 +11,9 @@
         <item name="android:textColorSecondary">@color/textColorSecondary</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/blue</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_close_action_mode</item>
     </style>
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>

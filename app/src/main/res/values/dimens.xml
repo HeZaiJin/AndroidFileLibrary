@@ -8,6 +8,7 @@
     <dimen name="list_item_height">72dp</dimen>
     <dimen name="list_item_image_height">40dp</dimen>
     <dimen name="list_item_padding">16dp</dimen>
+    <dimen name="list_item_padding_start">8dp</dimen>
     <dimen name="list_item_title_size">16sp</dimen>
     <dimen name="list_item_summary_size">14sp</dimen>
     <dimen name="list_divider_inset_space">72dp</dimen>

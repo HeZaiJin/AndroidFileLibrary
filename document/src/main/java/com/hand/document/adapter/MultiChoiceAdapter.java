@@ -33,12 +33,13 @@ public abstract class MultiChoiceAdapter<VH extends BaseHolder> extends BaseRecy
         return mMultiChoiceHelper.isEditing();
     }
 
-    public void toggleItemChecked(int position) {
+    /*public void toggleItemChecked(int position) {
         mMultiChoiceHelper.toggleItemChecked(position, true);
-    }
+    }*/
 
     public void exitEditing() {
         mMultiChoiceHelper.clearChoices();
+        notifyDataSetChanged();
     }
 
     @Override
@@ -47,6 +48,9 @@ public abstract class MultiChoiceAdapter<VH extends BaseHolder> extends BaseRecy
             int position = getAdapterPosition(v);
             if (position != RecyclerView.NO_POSITION) {
                 mMultiChoiceHelper.toggleItemChecked(position, true);
+                if (!isEditing()) {
+                    notifyDataSetChanged();
+                }
             }
         } else {
             super.onClick(v);
@@ -74,6 +78,10 @@ public abstract class MultiChoiceAdapter<VH extends BaseHolder> extends BaseRecy
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             view.setActivated(isChecked);
         }
+    }
+
+    public int getCheckItemCount() {
+        return mMultiChoiceHelper.getCheckedItemCount();
     }
 
     public SparseBooleanArray getCheckedItemPositions() {

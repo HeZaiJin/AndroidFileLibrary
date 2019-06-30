@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">AndroidFileLibrary</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -12,5 +12,8 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
+    <string name="menu_delete">Delete</string>
     <string name="menu_send">Send</string>
+    <string name="mode_selected_count"><xliff:g id="count" example="3">%1$d</xliff:g> selected</string>
+
 </resources>

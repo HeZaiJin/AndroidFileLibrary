@@ -1,10 +1,10 @@
 package com.hand.file.ui
 
 import android.os.Bundle
-import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.loader.app.LoaderManager
@@ -24,7 +24,7 @@ import com.hand.file.ui.widget.DividerItemDecoration
 /**
  * TODO save FragmentState
  */
-class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener {
+class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, DocumentActionMode.Callback {
 
 
     companion object {
@@ -58,9 +58,9 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = view.findViewById(R.id.list)
         recyclerView!!.layoutManager = LinearLayoutManager(context)
-        val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-        decoration.setInset(resources.getDimensionPixelSize(R.dimen.list_divider_inset_space), 0)
-        recyclerView!!.addItemDecoration(decoration)
+//        val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+//        decoration.setInset(resources.getDimensionPixelSize(R.dimen.list_divider_inset_space), 0)
+//        recyclerView!!.addItemDecoration(decoration)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -105,22 +105,35 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener {
 
     fun getActionModeCallback(): DocumentActionMode {
         if (null == actionModeCallback) {
-            actionModeCallback = DocumentActionMode(rootInfo!!, documentInfo!!)
+            actionModeCallback = DocumentActionMode(context!!, adapter!!, rootInfo!!, documentInfo!!, this)
         }
         return actionModeCallback!!
     }
 
     override fun onItemCheckedStateChanged(position: Int, checked: Boolean) {
-
+        actionModeCallback?.update(position, checked)
     }
 
     override fun onEditingStateChanged(edit: Boolean) {
-        /*if (edit) {
-            actionMode = activity!!.startActionMode(getActionModeCallback())
+        if (edit) {
+            actionMode = (activity as DocumentActivity)?.startSupportActionMode(getActionModeCallback())
+            actionModeCallback!!.actionMode = actionMode
         } else if (null != actionMode) {
             actionMode!!.finish()
-        }*/
+        }
     }
+
+    override fun onActionModeDestroy() {
+        (activity as DocumentActivity).updateStatusBarColor(resources.getColor(R.color.white), true)
+        if (adapter!!.isEditing) {
+            adapter!!.exitEditing()
+        }
+    }
+
+    override fun onActionModeCreated() {
+        (activity as DocumentActivity).updateStatusBarColor(resources.getColor(R.color.blue), false)
+    }
+
 
     override fun onPause() {
         super.onPause()
