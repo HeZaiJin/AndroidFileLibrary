@@ -1,5 +1,6 @@
 package com.hand.document.core;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.ArrayMap;
@@ -11,8 +12,10 @@ public class DocumentState implements Parcelable {
     public RootInfo mRoot;
 
     public ArrayMap<String, SparseArray<Parcelable>> mDisplayState = new ArrayMap<>();
+    public ArrayMap<String, Cursor> mDirCursors = new ArrayMap<>();
 
     public DocumentState(RootInfo info) {
+        clear();
         mRoot = info;
     }
 
@@ -56,12 +59,25 @@ public class DocumentState implements Parcelable {
         return mStack.size();
     }
 
-    public void clearStack() {
+    public void clear() {
+        mRoot = null;
         mStack.clear();
+        mDisplayState.clear();
+        mDirCursors.clear();
     }
 
     public void saveDisplayState(String key, SparseArray<Parcelable> parcelable) {
         mDisplayState.put(key, parcelable);
+    }
+
+    public void saveDirCursor(String key, Cursor cursor) {
+        if (null != cursor && !cursor.isClosed()) {
+            mDirCursors.put(key, cursor);
+        }
+    }
+
+    public Cursor getDirCursor(String key) {
+        return mDirCursors.remove(key);
     }
 
     public SparseArray<Parcelable> getDisplayState(String key) {

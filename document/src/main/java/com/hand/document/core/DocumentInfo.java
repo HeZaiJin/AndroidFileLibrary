@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import androidx.annotation.Nullable;
 import com.hand.document.core.cursor.RootCursorWrapper;
 import com.hand.document.io.IoUtils;
 import com.hand.document.provider.ContentProviderClientCompat;
@@ -36,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.text.Collator;
+import java.util.Objects;
 
 /**
  * Representation of a {@link Document}.
@@ -370,4 +372,18 @@ public class DocumentInfo implements Durable, Parcelable {
         return sCollator.compare(lhs, rhs);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocumentInfo that = (DocumentInfo) o;
+        return authority.equals(that.authority) &&
+                documentId.equals(that.documentId) &&
+                path.equals(that.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(authority, documentId, path);
+    }
 }

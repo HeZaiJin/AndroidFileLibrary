@@ -44,6 +44,9 @@ public abstract class MultiChoiceAdapter<VH extends BaseHolder> extends BaseRecy
 
     @Override
     public void onClick(View v) {
+        if (isEmpty()) {
+            return;
+        }
         if (isEditing()) {
             int position = getAdapterPosition(v);
             if (position != RecyclerView.NO_POSITION) {
@@ -67,6 +70,9 @@ public abstract class MultiChoiceAdapter<VH extends BaseHolder> extends BaseRecy
 
     @Override
     public boolean onLongClick(View v) {
+        if (isEmpty()) {
+            return false;
+        }
         if (isEditing()) {
             return super.onLongClick(v);
         }

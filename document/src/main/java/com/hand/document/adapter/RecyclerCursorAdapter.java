@@ -7,8 +7,10 @@ public abstract class RecyclerCursorAdapter<T, VH extends BaseHolder<T>> extends
 
     private Cursor mCursor;
     private int mCursorCount;
+    private boolean isLoaded = false;
 
     public void swapResult(Cursor cursor) {
+        isLoaded = true;
         mCursor = cursor;
         mCursorCount = mCursor != null ? mCursor.getCount() : 0;
         notifyDataSetChanged();
@@ -34,5 +36,14 @@ public abstract class RecyclerCursorAdapter<T, VH extends BaseHolder<T>> extends
         }
     }
 
+    public Cursor getCursor() {
+        return mCursor;
+    }
+
     public abstract T obtainItem(Cursor cursor);
+
+    @Override
+    public boolean isEmpty() {
+        return isLoaded && mCursorCount == 0;
+    }
 }

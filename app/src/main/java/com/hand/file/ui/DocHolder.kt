@@ -12,22 +12,24 @@ import com.hand.file.R
  */
 class DocHolder(itemView: View) : BaseHolder<DocumentInfo>(itemView) {
 
-    private var title: TextView = itemView.findViewById(R.id.title)
-    private var desc: TextView = itemView.findViewById(R.id.desc)
-    private var checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
+    private var title: TextView? = itemView.findViewById(R.id.title)
+    private var desc: TextView? = itemView.findViewById(R.id.desc)
+    private var checkBox: CheckBox? = itemView.findViewById(R.id.checkbox)
+    private var more: View? = itemView.findViewById(R.id.more)
 
     override fun setData(data: DocumentInfo?) {
-        this.title.text = data!!.displayName
-        this.desc.text = data!!.summary
+        this.title!!.text = data!!.displayName
+        this.desc!!.text = data!!.summary
     }
 
     override fun setEditState(editing: Boolean) {
-        checkBox.visibility = if (editing) View.VISIBLE else View.INVISIBLE
-        if (!editing) checkBox.isChecked = false
+        checkBox!!.visibility = if (editing) View.VISIBLE else View.INVISIBLE
+        more!!.visibility = if (!editing) View.VISIBLE else View.INVISIBLE
+        if (!editing) checkBox!!.isChecked = false
     }
 
     override fun setItemChecked(checked: Boolean) {
-        checkBox.isChecked = checked
+        checkBox!!.isChecked = checked
     }
 
 }

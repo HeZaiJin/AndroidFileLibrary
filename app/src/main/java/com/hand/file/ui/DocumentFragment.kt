@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -47,6 +48,7 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
         }
     }
 
+    private var loadingBar: ProgressBar? = null
     private var recyclerView: RecyclerView? = null
     private var adapter: DocAdapter? = null
     private var rootInfo: RootInfo? = null
@@ -57,10 +59,8 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = view.findViewById(R.id.list)
+        loadingBar = view.findViewById(R.id.loading)
         recyclerView!!.layoutManager = LinearLayoutManager(context)
-//        val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-//        decoration.setInset(resources.getDimensionPixelSize(R.dimen.list_divider_inset_space), 0)
-//        recyclerView!!.addItemDecoration(decoration)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -73,16 +73,23 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
         documentInfo = arguments!!.get(EXTRA_DOC) as DocumentInfo?
 
         adapter = DocAdapter(R.layout.item_doc)
-
         recyclerView!!.adapter = adapter
+        val dirCursor = (activity as DocumentActivity).getState()?.getDirCursor(getDisplayStateKey())
+        if (null != dirCursor) {
+            loadingBar!!.visibility = View.INVISIBLE
+            adapter!!.swapResult(dirCursor)
+            restoreDisplayState()
+        }
 
         var callback = object : LoaderManager.LoaderCallbacks<DirectoryResult> {
 
             override fun onCreateLoader(id: Int, args: Bundle?): Loader<DirectoryResult> {
+
                 return DirectoryLoader(context!!, rootInfo, documentInfo)
             }
 
             override fun onLoadFinished(loader: Loader<DirectoryResult>, data: DirectoryResult?) {
+                loadingBar!!.visibility = View.INVISIBLE
                 adapter!!.swapResult(data!!.cursor)
                 restoreDisplayState()
                 LogUtil.d(MainActivity.TAG, "onLoadFinished")
@@ -175,8 +182,15 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
         return false
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
+
     override fun onPause() {
         super.onPause()
+        if (null != adapter && null != adapter!!.cursor) {
+            (activity as DocumentActivity).getState()?.saveDirCursor(getDisplayStateKey(), adapter!!.cursor)
+        }
         (activity as DocumentActivity).saveDisplayState(getDisplayStateKey(), view!!)
     }
 

@@ -94,7 +94,9 @@ public class MultiChoiceHelper {
                 mCheckedItemCount = mAdapter.getItemCount();
                 //need approve
                 for (int i = 0; i < mCheckedItemCount; i++) {
-                    mCheckStates.put(i, true);
+                    if (!mCheckStates.get(i)) {
+                        mCheckStates.put(i, true);
+                    }
                 }
                 mAdapter.notifyDataSetChanged();
             }
@@ -106,12 +108,6 @@ public class MultiChoiceHelper {
     }
 
     public void setItemChecked(int position, boolean value, boolean notifyChanged) {
-        if (isSelectAll() && !value) {
-            mSelectMode = SELECT_NORMAL;
-            if (null != mListener) {
-                mListener.onSelectAll(false);
-            }
-        }
         boolean oldValue = mCheckStates.get(position);
         mCheckStates.put(position, value);
         if (oldValue != value) {
@@ -146,6 +142,11 @@ public class MultiChoiceHelper {
                 mSelectMode = SELECT_ALL;
                 if (null != mListener) {
                     mListener.onSelectAll(true);
+                }
+            } else if (isSelectAll()) {
+                mSelectMode = SELECT_NORMAL;
+                if (null != mListener) {
+                    mListener.onSelectAll(false);
                 }
             }
         }

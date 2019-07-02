@@ -7,6 +7,7 @@
         tools:context=".ui.DocumentActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/barLayout"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:theme="@style/AppTheme.AppBarOverlay">
@@ -21,6 +22,13 @@
                 android:theme="@style/ThemeOverlay.AppCompat.Light"
                 app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
+        <!--<com.hand.file.ui.widget.FolderNavigationBar-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:id="@+id/navigate"-->
+                <!--android:layout_height="@dimen/folder_navigate_height"-->
+                <!--android:paddingStart="@dimen/list_item_padding"-->
+                <!--android:paddingEnd="@dimen/list_item_padding"-->
+        <!--&gt;</com.hand.file.ui.widget.FolderNavigationBar>-->
     </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout

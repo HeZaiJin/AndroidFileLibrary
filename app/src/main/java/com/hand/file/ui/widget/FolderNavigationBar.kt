@@ -24,7 +24,7 @@ class FolderNavigationBar @JvmOverloads constructor(context: Context, attrs: Att
         this.adapter = mAdapter
     }
 
-    fun setNavigateListener(listener: NavigateListener): FolderNavigationBar {
+    fun setNavigateListener(listener: NavigateListener<Any>): FolderNavigationBar {
         this.mAdapter!!.setNavigateListener(listener)
         return this
     }
@@ -44,8 +44,8 @@ class FolderNavigationBar @JvmOverloads constructor(context: Context, attrs: Att
         var mTitle: String? = null
     }
 
-    interface NavigateListener {
-        fun onNavigate(info: Any?)
+    interface NavigateListener<T> {
+        fun onNavigate(info: T)
     }
 
     fun onBackPressed(): Boolean {

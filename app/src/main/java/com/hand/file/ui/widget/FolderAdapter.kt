@@ -12,9 +12,9 @@ import java.util.*
 
 class FolderAdapter : RecyclerView.Adapter<FolderAdapter.Holder>(), View.OnClickListener {
     private val mInfoList = ArrayList<FolderNavigationBar.NavigationInfo>()
-    private var mListener: FolderNavigationBar.NavigateListener? = null
+    private var mListener: FolderNavigationBar.NavigateListener<Any>? = null
 
-    fun setNavigateListener(listener: FolderNavigationBar.NavigateListener) {
+    fun setNavigateListener(listener: FolderNavigationBar.NavigateListener<Any>) {
         this.mListener = listener
     }
 
@@ -26,7 +26,7 @@ class FolderAdapter : RecyclerView.Adapter<FolderAdapter.Holder>(), View.OnClick
             return
         }
         val start = index + 1
-        mListener!!.onNavigate(tag.mInfo)
+        mListener?.onNavigate(tag.mInfo!!)
         mInfoList.subList(start, itemCount).clear()
         notifyDataSetChanged()
     }
@@ -40,13 +40,11 @@ class FolderAdapter : RecyclerView.Adapter<FolderAdapter.Holder>(), View.OnClick
         val end = itemCount - 1
         if (end > 0) {
             val into = end - 1
-            val info = mInfoList[into]
-            if (null != mListener) {
-                mInfoList.removeAt(end)
-                notifyItemRemoved(into)
-                mListener!!.onNavigate(info.mInfo)
-                return true
-            }
+//            val info = mInfoList[into]
+            mInfoList.removeAt(end)
+            notifyItemRemoved(into)
+//                mListener?.onNavigate(info.mInfo)
+            return true
         }
         return false
     }

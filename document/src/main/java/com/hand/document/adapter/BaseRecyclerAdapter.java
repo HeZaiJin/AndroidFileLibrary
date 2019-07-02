@@ -1,6 +1,7 @@
 package com.hand.document.adapter;
 
 import android.view.View;
+import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.hand.document.R;
@@ -52,5 +53,10 @@ public abstract class BaseRecyclerAdapter<VH extends BaseHolder> extends Recycle
 
     public interface onItemClickListener {
         void onItemClick(View view, int position);
+    }
+
+
+    public boolean isEmpty() {
+        return false;
     }
 }
