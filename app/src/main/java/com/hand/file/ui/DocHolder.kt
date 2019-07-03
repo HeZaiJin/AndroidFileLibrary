@@ -23,13 +23,19 @@ class DocHolder(itemView: View) : BaseHolder<DocumentInfo>(itemView) {
     }
 
     override fun setEditState(editing: Boolean) {
-        checkBox!!.visibility = if (editing) View.VISIBLE else View.INVISIBLE
-        more!!.visibility = if (!editing) View.VISIBLE else View.INVISIBLE
-        if (!editing) checkBox!!.isChecked = false
+        checkBox?.let {
+            it.visibility = if (editing) View.VISIBLE else View.INVISIBLE
+            if (!editing) it.isChecked = false
+        }
+        more?.let {
+            it.visibility = if (editing) View.INVISIBLE else View.VISIBLE
+        }
     }
 
     override fun setItemChecked(checked: Boolean) {
-        checkBox!!.isChecked = checked
+        checkBox?.let {
+            it.isChecked = checked
+        }
     }
 
 }

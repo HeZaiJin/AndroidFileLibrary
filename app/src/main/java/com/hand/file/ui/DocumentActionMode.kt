@@ -27,24 +27,18 @@ class DocumentActionMode(context: Context, adapter: DocAdapter, root: RootInfo, 
     private var openAble: Boolean = true
     private var selectAll: Boolean = false
 
-    var actionMode: ActionMode? = null
-
     fun updateSelectAll(selectAll: Boolean) {
         if (this.selectAll == selectAll) {
             return
         }
         LogUtil.d(TAG, "updateSelectAll $selectAll, current selectAll ${this.selectAll}")
-        actionMode?.title = context.resources.getString(R.string.mode_selected_count, adapter.checkItemCount)
         shareAble = false
         openAble = false
         this.selectAll = selectAll
-        actionMode?.invalidate()
     }
 
 
-    fun update(position: Int, checked: Boolean) {
-        actionMode?.title = context.resources.getString(R.string.mode_selected_count, adapter.checkItemCount)
-        //
+    fun update(actionMode: ActionMode?, position: Int, checked: Boolean) {
         val item = adapter.getItem(position)
         if (item.isDirectory) {
             if (checked) {
@@ -64,9 +58,12 @@ class DocumentActionMode(context: Context, adapter: DocAdapter, root: RootInfo, 
             openAble = open
             requestInvalidate = true
         }
-
-        if (requestInvalidate) {
-            actionMode?.invalidate()
+        actionMode?.apply {
+            if (requestInvalidate) {
+                invalidate()
+            } else {
+                title = context.resources.getString(R.string.mode_selected_count, adapter.checkItemCount)
+            }
         }
     }
 
@@ -78,24 +75,32 @@ class DocumentActionMode(context: Context, adapter: DocAdapter, root: RootInfo, 
     }
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        mode!!.menuInflater.inflate(R.menu.mode_document, menu)
-        mode.title = context.resources.getString(R.string.mode_selected_count, adapter.checkItemCount)
-        callback.onActionModeCreated()
+        mode?.let {
+            it.menuInflater.inflate(R.menu.mode_document, menu)
+            it.title = context.resources.getString(R.string.mode_selected_count, adapter.checkItemCount)
+        }
         return true
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        var count = adapter.checkItemCount
-        val share = menu!!.findItem(R.id.menu_share)
-        val open = menu!!.findItem(R.id.menu_open_as)
-        val info = menu!!.findItem(R.id.menu_info)
-        val rename = menu!!.findItem(R.id.menu_rename)
-        val selectAll = menu!!.findItem(R.id.menu_select_all)
-        rename!!.isVisible = count == 1
-        info!!.isVisible = count == 1
-        open!!.isVisible = openAble
-        share!!.isVisible = shareAble
-        selectAll.setTitle(if (this.selectAll) R.string.menu_select_un_all else R.string.menu_select_all)
+        menu?.let {
+            var count = adapter.checkItemCount
+            mode?.apply {
+                title = context.resources.getString(R.string.mode_selected_count, adapter.checkItemCount)
+            }
+            val share = it.findItem(R.id.menu_share)
+            val open = it.findItem(R.id.menu_open_as)
+            val info = it.findItem(R.id.menu_info)
+            val rename = it.findItem(R.id.menu_rename)
+            val selectAll = it.findItem(R.id.menu_select_all)
+            rename.isVisible = count == 1
+            info.isVisible = count == 1
+            open.isVisible = openAble
+            share.isVisible = shareAble
+            selectAll.setTitle(if (this.selectAll) R.string.menu_select_un_all else R.string.menu_select_all)
+            callback.onActionModeCreated()
+        }
+
         return true
     }
 

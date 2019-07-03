@@ -18,13 +18,13 @@ import com.hand.document.core.RootInfo
 import com.hand.document.provider.Providers
 import com.hand.document.util.BuildUtils
 import com.hand.file.R
-import com.hand.file.ui.widget.FolderNavigationBar
+import com.hand.file.setupActionBar
 
 
 /**
  * TODO Document Stack
  */
-class DocumentActivity : AppCompatActivity(), FolderNavigationBar.NavigateListener<DocumentInfo> {
+class DocumentActivity : AppCompatActivity()/*, FolderNavigationBar.NavigateListener<DocumentInfo>*/ {
 
     companion object {
         var TAG = "DocumentActivity"
@@ -33,24 +33,36 @@ class DocumentActivity : AppCompatActivity(), FolderNavigationBar.NavigateListen
         }
     }
 
-    private var state: DocumentState? = null
-    private var rootInfo: RootInfo? = null
-    private var toolbar: Toolbar? = null
-    private var appBarLayout: AppBarLayout? = null
-//    private var navigate: FolderNavigationBar? = null
+    private lateinit var state: DocumentState
+    private lateinit var rootInfo: RootInfo
+    private lateinit var appBarLayout: AppBarLayout
+    private var actionModeState = false
+
+    //    private var navigate: FolderNavigationBar? = null
     private var currentDocumentInfo: DocumentInfo? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_document)
         appBarLayout = findViewById(R.id.barLayout)
-        toolbar = findViewById(R.id.toolbar)
+        setupActionBar(R.id.toolbar) {
+            setHomeAsUpIndicator(R.drawable.ic_menu)
+            setDisplayHomeAsUpEnabled(true)
+            (findViewById<Toolbar>(R.id.toolbar)).apply {
+                setSupportActionBar(this)
+                this.setNavigationOnClickListener { onBackPressed() }
+            }
+        }
 //        navigate = findViewById(R.id.navigate)
-        setSupportActionBar(toolbar)
-        toolbar!!.setNavigationOnClickListener { onBackPressed() }
-        this.rootInfo = Providers.getLocalRoots(applicationContext)!![0]
-        state = DocumentState(rootInfo)
-        title = rootInfo!!.title
+        //TODO read root from intent
+        Providers.getLocalRoots(applicationContext)?.also {
+            it[0]?.apply {
+                rootInfo = this
+                state = DocumentState(rootInfo)
+                title = this.title
+            }
+        }
+
         openRootDirectory()
     }
 
@@ -72,18 +84,21 @@ class DocumentActivity : AppCompatActivity(), FolderNavigationBar.NavigateListen
 
     fun openDirectory(rootInfo: RootInfo, documentInfo: DocumentInfo, back: Boolean) {
         Log.d(TAG, "openDirectory rootInfo $rootInfo, documentInfo $documentInfo")
-        if (!back && null != documentInfo) {
-            state!!.pushStack(documentInfo)
-            dumpStack()
+        documentInfo.apply {
+            if (!back) {
+                state.pushStack(this)
+                dumpStack()
+            }
+            DocumentFragment.start(supportFragmentManager, rootInfo, this)
+            onDirectoryChanged(this)
         }
-        DocumentFragment.start(supportFragmentManager, rootInfo, documentInfo)
-        onDirectoryChanged(documentInfo!!)
     }
 
     fun saveDisplayState(key: String, view: View) {
-        var container: SparseArray<Parcelable> = SparseArray()
-        view.saveHierarchyState(container)
-        state?.saveDisplayState(key, container)
+        SparseArray<Parcelable>().apply {
+            view.saveHierarchyState(this)
+            state.saveDisplayState(key, this)
+        }
     }
 
     fun restoreDisplayState(key: String, view: View) {
@@ -93,16 +108,16 @@ class DocumentActivity : AppCompatActivity(), FolderNavigationBar.NavigateListen
         }
     }
 
-    fun getState(): DocumentState? {
+    fun getState(): DocumentState {
         return state
     }
 
     fun getDisplayState(key: String): SparseArray<Parcelable>? {
-        return state!!.getDisplayState(key)
+        return state.getDisplayState(key)
     }
 
     fun getCurrentDirectory(): DocumentInfo? {
-        return state!!.peekStack()
+        return state.peekStack()
     }
 
     fun openRootDirectory() {
@@ -110,78 +125,77 @@ class DocumentActivity : AppCompatActivity(), FolderNavigationBar.NavigateListen
         if (null == documentInfo) {
             documentInfo = DocumentInfo(true)
         }
-        openDirectory(rootInfo!!, documentInfo, false)
+        openDirectory(rootInfo, documentInfo, false)
     }
 
     fun onDirectoryChanged(documentInfo: DocumentInfo) {
         var name = documentInfo.displayName
         if (TextUtils.isEmpty(name)) {
-            name = rootInfo?.title
+            name = rootInfo.title
         }
 //        navigate?.openFolder(documentInfo, name)
         currentDocumentInfo = documentInfo
         title = name
     }
 
-    override fun onNavigate(info: DocumentInfo) {
-        if (null != currentDocumentInfo) {
-            if (currentDocumentInfo!! == info) {
-                return
-            }
-        }
-        if (info.isRootDirectory) {
-            state?.clear()
-            openRootDirectory()
-        } else if (null != state){
-            var documentInfo = state!!.peekStack()
-            while (documentInfo != info) {
-                state!!.popStack()
-                documentInfo = state!!.peekStack()
-            }
-            openDirectory(rootInfo!!, info, false)
-        }
-    }
+//    override fun onNavigate(info: DocumentInfo) {
+//        if (null != currentDocumentInfo) {
+//            if (currentDocumentInfo!! == info) {
+//                return
+//            }
+//        }
+//        if (info.isRootDirectory) {
+//            state.clear()
+//            openRootDirectory()
+//        } else if (null != state) {
+//            var documentInfo = state!!.peekStack()
+//            while (documentInfo != info) {
+//                state!!.popStack()
+//                documentInfo = state!!.peekStack()
+//            }
+//            openDirectory(rootInfo!!, info, false)
+//        }
+//    }
 
-    fun updateStatusBarColor(color: Int, light: Boolean) {
-        if (BuildUtils.hasLollipop()) {
-            window.statusBarColor = color
-            val systemUiVisibility = window.decorView.systemUiVisibility
-            if (light) {
-                window.decorView.systemUiVisibility = (systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
-            } else {
-                window.decorView.systemUiVisibility = (systemUiVisibility xor View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
+    fun updateActionModeState(start: Boolean) {
+        if (start != actionModeState) {
+            actionModeState = start
+            if (BuildUtils.hasLollipop()) {
+                window.apply {
+                    decorView.systemUiVisibility = if (start) {
+                        statusBarColor = resources.getColor(R.color.blue)
+                        decorView.systemUiVisibility xor View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                    } else {
+                        statusBarColor = resources.getColor(R.color.white)
+                        decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                    }
+                }
             }
         }
-//        toolbar?.visibility = if (visible) View.VISIBLE else View.INVISIBLE
     }
 
     override fun onBackPressed() {
-//        navigate?.onBackPressed()
-        if (state!!.stackSize > 0) {
-            state!!.popStack()
-            dumpStack()
-            var documentInfo = state!!.peekStack()
-            if (null == documentInfo) {
-                super.onBackPressed()
-            } else {
-                openDirectory(rootInfo!!, documentInfo, true)
-            }
-            return
-        }
         dumpStack()
+        if (state.stackSize > 0) {
+            state.popStack()
+            state.peekStack()?.run {
+                openDirectory(rootInfo, this, true)
+                return
+            }
+        }
         super.onBackPressed()
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
-        state?.clear()
+        state.clear()
     }
 
     private fun dumpStack() {
-        Log.d(TAG, "Current stack: size = " + state!!.mStack.size)
-        Log.d(TAG, " * " + state!!.mStack.root)
-        for (doc in state!!.mStack) {
+        Log.d(TAG, "Current stack: size = " + state.mStack.size)
+        Log.d(TAG, " * " + state.mStack.root)
+        for (doc in state.mStack) {
             Log.d(TAG, " +-- $doc")
         }
     }

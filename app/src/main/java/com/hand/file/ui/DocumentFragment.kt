@@ -48,11 +48,11 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
         }
     }
 
-    private var loadingBar: ProgressBar? = null
-    private var recyclerView: RecyclerView? = null
-    private var adapter: DocAdapter? = null
-    private var rootInfo: RootInfo? = null
-    private var documentInfo: DocumentInfo? = null
+    private lateinit var loadingBar: ProgressBar
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: DocAdapter
+    private lateinit var rootInfo: RootInfo
+    private lateinit var documentInfo: DocumentInfo
     private var actionModeCallback: DocumentActionMode? = null
     private var actionMode: ActionMode? = null
 
@@ -60,7 +60,7 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
         super.onViewCreated(view, savedInstanceState)
         recyclerView = view.findViewById(R.id.list)
         loadingBar = view.findViewById(R.id.loading)
-        recyclerView!!.layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = LinearLayoutManager(context)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -69,18 +69,16 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        rootInfo = arguments!!.get(EXTRA_ROOT) as RootInfo?
-        documentInfo = arguments!!.get(EXTRA_DOC) as DocumentInfo?
+        rootInfo = arguments!!.get(EXTRA_ROOT)!! as RootInfo
+        documentInfo = arguments!!.get(EXTRA_DOC)!! as DocumentInfo
 
         adapter = DocAdapter(R.layout.item_doc)
-        recyclerView!!.adapter = adapter
-        val dirCursor = (activity as DocumentActivity).getState()?.getDirCursor(getDisplayStateKey())
-        if (null != dirCursor) {
-            loadingBar!!.visibility = View.INVISIBLE
-            adapter!!.swapResult(dirCursor)
+        recyclerView.adapter = adapter
+        (activity as DocumentActivity).getState().getDirCursor(getDisplayStateKey())?.let {
+            loadingBar.visibility = View.INVISIBLE
+            adapter.swapResult(it)
             restoreDisplayState()
         }
-
         var callback = object : LoaderManager.LoaderCallbacks<DirectoryResult> {
 
             override fun onCreateLoader(id: Int, args: Bundle?): Loader<DirectoryResult> {
@@ -100,33 +98,40 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
             }
 
         }
-        LoaderManager.getInstance(activity!!).restartLoader(LOADER_ID, null, callback)
-        //test code
-        adapter!!.setItemClickListener { view, position ->
-            run {
-                (activity as DocumentActivity).openDirectory(rootInfo!!, adapter!!.getItem(position), false)
-            }
+        activity?.let {
+            LoaderManager.getInstance(it).restartLoader(LOADER_ID, null, callback)
         }
-        adapter!!.setMultiChoiceListener(this)
+        //test code
+        adapter.setItemClickListener { v, position ->
+            (activity as DocumentActivity).openDirectory(rootInfo, adapter.getItem(position), false)
+        }
+        adapter.setMultiChoiceListener(this)
     }
 
-    fun getActionModeCallback(): DocumentActionMode {
-        if (null == actionModeCallback) {
-            actionModeCallback = DocumentActionMode(context!!, adapter!!, rootInfo!!, documentInfo!!, this)
+    private fun getActionModeCallback(): DocumentActionMode? {
+        context?.run {
+            if (null == actionModeCallback) {
+                actionModeCallback = DocumentActionMode(this, adapter, rootInfo, documentInfo, this@DocumentFragment)
+            }
         }
-        return actionModeCallback!!
+        return actionModeCallback
     }
 
     override fun onItemCheckedStateChanged(position: Int, checked: Boolean) {
-        actionModeCallback?.update(position, checked)
+        actionModeCallback?.update(actionMode, position, checked)
     }
 
     override fun onEditingStateChanged(edit: Boolean) {
+        LogUtil.d(TAG, "onEditingStateChanged start")
         if (edit) {
-            actionMode = (activity as DocumentActivity)?.startSupportActionMode(getActionModeCallback())
-            actionModeCallback!!.actionMode = actionMode
-        } else if (null != actionMode) {
-            actionMode!!.finish()
+            var documentActionMode = getActionModeCallback() ?: return
+            LogUtil.d(TAG, "onEditingStateChanged get ActionMode end")
+            actionMode = (activity as DocumentActivity)?.startSupportActionMode(documentActionMode)
+            LogUtil.d(TAG, "onEditingStateChanged start ActionMode end")
+        } else {
+            actionMode?.apply {
+                finish()
+            }
         }
     }
 
@@ -135,26 +140,33 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
     }
 
     override fun onActionModeDestroy() {
-        (activity as DocumentActivity).updateStatusBarColor(resources.getColor(R.color.white), true)
-        if (adapter!!.isEditing) {
-            adapter!!.exitEditing()
+        (activity as DocumentActivity)?.run {
+            updateActionModeState(false)
+        }
+        if (adapter.isEditing) {
+            adapter.exitEditing()
         }
     }
 
     override fun onActionModeCreated() {
-        (activity as DocumentActivity).updateStatusBarColor(resources.getColor(R.color.blue), false)
+        (activity as DocumentActivity)?.run {
+            updateActionModeState(true)
+        }
     }
 
     private fun selectAll(selectAll: Boolean) {
-        adapter?.selectAll(selectAll)
+        adapter.selectAll(selectAll)
     }
 
     override fun onActionMenuClick(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_select_all -> {
-                var selectAll = adapter!!.isSelectAll
+                var selectAll = adapter.isSelectAll
                 selectAll(!selectAll)
-                actionModeCallback?.updateSelectAll(!selectAll)
+                actionModeCallback?.run {
+                    updateSelectAll(!selectAll)
+                    actionMode?.invalidate()
+                }
                 return false
             }
             R.id.menu_delete -> {
@@ -188,15 +200,21 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
 
     override fun onPause() {
         super.onPause()
-        if (null != adapter && null != adapter!!.cursor) {
-            (activity as DocumentActivity).getState()?.saveDirCursor(getDisplayStateKey(), adapter!!.cursor)
+        adapter.cursor?.run {
+            (activity as DocumentActivity)?.apply {
+                getState().saveDirCursor(getDisplayStateKey(), adapter.cursor)
+                view?.apply {
+                    saveDisplayState(getDisplayStateKey(), this)
+                }
+            }
         }
-        (activity as DocumentActivity).saveDisplayState(getDisplayStateKey(), view!!)
     }
 
     private fun restoreDisplayState() {
-        if (null != this@DocumentFragment.view) {
-            (activity as DocumentActivity).restoreDisplayState(getDisplayStateKey(), this@DocumentFragment.view!!)
+        (activity as DocumentActivity)?.apply {
+            if (null != view) {
+                restoreDisplayState(getDisplayStateKey(), view!!)
+            }
         }
     }
 
