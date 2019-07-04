@@ -20,6 +20,7 @@ import com.hand.document.core.DocumentInfo
 import com.hand.document.core.RootInfo
 import com.hand.document.util.LogUtil
 import com.hand.file.R
+import com.hand.file.ui.widget.BottomChooseDialog
 
 
 /**
@@ -176,6 +177,21 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
                 return true
             }
             R.id.menu_cut -> {
+                context?.run {
+                    BottomChooseDialog<RootInfo>(this).apply {
+                        var roots = ArrayList<BottomChooseDialog.Data<RootInfo>>()
+                        var data = BottomChooseDialog.Data<RootInfo>(
+                            rootInfo.title,
+                            resources.getDrawable(R.drawable.ic_root_documents),
+                            rootInfo
+                        )
+                        bindData(
+                            roots.apply {
+                                add(data)
+                            }
+                        )
+                    }.show()
+                }
                 return true
             }
             R.id.menu_info -> {
