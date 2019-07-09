@@ -10,4 +10,46 @@
         tools:context=".ui.MainActivity">
 
 
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical">
+        <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/downloads"
+                android:layout_width="match_parent"
+                android:onClick="onClick"
+                android:text="@string/root_downloads"
+                android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatButton
+                android:onClick="onClick"
+                android:id="@+id/image"
+                android:text="@string/root_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatButton
+                android:onClick="onClick"
+                android:id="@+id/video"
+                android:text="@string/root_video"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/auto"
+                android:onClick="onClick"
+                android:text="@string/root_audio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatButton
+                android:onClick="onClick"
+                android:id="@+id/documents"
+                android:text="@string/root_documents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        <androidx.appcompat.widget.AppCompatButton
+                android:onClick="onClick"
+                android:id="@+id/applications"
+                android:text="@string/root_application"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.appcompat.view.ActionMode
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.loader.app.LoaderManager
@@ -46,6 +47,7 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
             val fragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.content, fragment)
             fragmentTransaction.commitAllowingStateLoss()
+            LogUtil.d(TAG, "start document $documentInfo")
         }
     }
 

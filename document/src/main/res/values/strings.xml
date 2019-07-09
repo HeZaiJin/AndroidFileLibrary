@@ -3,7 +3,13 @@
 
     <string name="root_internal_storage">Internal Storage</string>
     <string name="root_external_storage">External Storage</string>
-
+    <string name="root_bluetooth">Bluetooth</string>
+    <string name="root_downloads">Downloads</string>
+    <string name="root_image">Image</string>
+    <string name="root_audio">Audio</string>
+    <string name="root_video">Video</string>
+    <string name="root_documents">Documents</string>
+    <string name="root_application">Applications</string>
 
     <!-- Size unit, displayed in a button next to an attachment [CHAR LIMIT=5] -->
     <string name="bytes"><xliff:g id="count">%s</xliff:g> B
@@ -31,5 +37,25 @@
     <string name="sort_dimension_date">Modified</string>
     <string name="menu_select_all">Select All</string>
     <string name="menu_select_un_all">UnSelect All</string>
+
+
+    <!--
+     Status indicating that the download has been queued to start in the future.  Appears for an
+     individual item in the download list.  [CHAR LIMIT=24]
+-->
+    <string name="download_queued">Queued</string>
+    <!--
+         Status indicating that the system is currently downloading the file.  Appears for an
+         individual item in the download list.  [CHAR LIMIT=24]
+    -->
+    <string name="download_running">In progress</string>
+    <!--
+         Status indicating that the download has ended without completing successfully.  Appears for
+         an individual item in the download list.  [CHAR LIMIT=24]
+    -->
+    <string name="download_error">Unsuccessful</string>
+
+    <!-- Representation of download progress percentage when running. [CHAR LIMIT=24] -->
+    <string name="download_running_percent">In progress, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
 
 </resources>

@@ -1,6 +1,7 @@
 package com.hand.file.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.TextUtils
@@ -17,6 +18,7 @@ import com.hand.document.core.DocumentState
 import com.hand.document.core.RootInfo
 import com.hand.document.provider.Providers
 import com.hand.document.util.BuildUtils
+import com.hand.document.util.LogUtil
 import com.hand.file.R
 import com.hand.file.setupActionBar
 
@@ -28,18 +30,42 @@ class DocumentActivity : AppCompatActivity()/*, FolderNavigationBar.NavigateList
 
     companion object {
         var TAG = "DocumentActivity"
-        fun start(context: Context, rootInfo: RootInfo) {
 
+        const val EXTRA_ROOT_TYPE = "root_type"
+        const val EXTRA_ROOT_INFO = "root_info"
+
+        fun start(context: Context, @Providers.RootType rootType: String, rootInfo: RootInfo?) {
+            LogUtil.d(TAG, "onClick start root $rootType")
+            context.startActivity(Intent(context, DocumentActivity::class.java).apply {
+                putExtra(EXTRA_ROOT_TYPE, rootType)
+                putExtra(EXTRA_ROOT_INFO, rootInfo)
+            })
+            LogUtil.d(TAG, "onClick start end")
         }
     }
 
     private lateinit var state: DocumentState
     private lateinit var rootInfo: RootInfo
     private lateinit var appBarLayout: AppBarLayout
+    private var rootType: String = Providers.ROOT_IMAGE
     private var actionModeState = false
 
     //    private var navigate: FolderNavigationBar? = null
     private var currentDocumentInfo: DocumentInfo? = null
+
+    private fun parseIntent(intent: Intent) {
+
+        var root = intent.getParcelableExtra<RootInfo>(EXTRA_ROOT_INFO)
+        rootType = intent.getStringExtra(EXTRA_ROOT_TYPE)
+
+        if (null == root) {
+            root = Providers.getRoot(this@DocumentActivity, rootType)
+        }
+        rootInfo = root
+        state = DocumentState(rootInfo)
+        title = rootInfo.title
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,15 +80,7 @@ class DocumentActivity : AppCompatActivity()/*, FolderNavigationBar.NavigateList
             }
         }
 //        navigate = findViewById(R.id.navigate)
-        //TODO read root from intent
-        Providers.getLocalRoots(applicationContext)?.also {
-            it[0]?.apply {
-                rootInfo = this
-                state = DocumentState(rootInfo)
-                title = this.title
-            }
-        }
-
+        parseIntent(intent)
         openRootDirectory()
     }
 

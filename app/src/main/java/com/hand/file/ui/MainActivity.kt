@@ -1,21 +1,15 @@
 package com.hand.file.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.loader.app.LoaderManager
-import androidx.loader.content.Loader
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
-import com.hand.document.core.DirectoryLoader
-import com.hand.document.core.DirectoryResult
-import com.hand.document.core.RootInfo
 import com.hand.document.provider.Providers
 import com.hand.document.util.LogUtil
 import com.hand.file.R
@@ -33,7 +27,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener {
-            startActivity(Intent(this@MainActivity, DocumentActivity::class.java))
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -45,6 +38,22 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         navView.setNavigationItemSelectedListener(this)
+    }
+
+    fun onClick(view: View) {
+        LogUtil.d(TAG, "onClick start ")
+        when (view.id) {
+            R.id.image -> {
+                DocumentActivity.start(this@MainActivity, Providers.ROOT_IMAGE, null)
+            }
+            R.id.video -> {
+                DocumentActivity.start(this@MainActivity, Providers.ROOT_VIDEO, null)
+            }
+            R.id.auto -> {
+                DocumentActivity.start(this@MainActivity, Providers.ROOT_AUDIO, null)
+            }
+        }
+        LogUtil.d(TAG, "onClick end ")
     }
 
     override fun onBackPressed() {
