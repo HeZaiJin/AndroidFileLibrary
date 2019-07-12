@@ -61,7 +61,7 @@ public class DocumentInfo implements Durable, Parcelable {
     public int flags;
     public String summary;
     public long size;
-    public int icon;
+    public String icon;
     public String path;
     public boolean rootDirectory;
 
@@ -89,7 +89,7 @@ public class DocumentInfo implements Durable, Parcelable {
         flags = 0;
         summary = null;
         size = -1;
-        icon = 0;
+        icon = null;
         path = null;
         derivedUri = null;
         this.rootDirectory = false;
@@ -110,7 +110,7 @@ public class DocumentInfo implements Durable, Parcelable {
                 flags = in.readInt();
                 summary = DurableUtils.readNullableString(in);
                 size = in.readLong();
-                icon = in.readInt();
+                icon = DurableUtils.readNullableString(in);
                 path = DurableUtils.readNullableString(in);
                 rootDirectory = in.readBoolean();
                 deriveFields();
@@ -131,7 +131,7 @@ public class DocumentInfo implements Durable, Parcelable {
         out.writeInt(flags);
         DurableUtils.writeNullableString(out, summary);
         out.writeLong(size);
-        out.writeInt(icon);
+        DurableUtils.writeNullableString(out, icon);
         DurableUtils.writeNullableString(out, path);
         out.writeBoolean(rootDirectory);
     }
@@ -182,7 +182,7 @@ public class DocumentInfo implements Durable, Parcelable {
         this.flags = getCursorInt(cursor, Document.COLUMN_FLAGS);
         this.summary = getCursorString(cursor, Document.COLUMN_SUMMARY);
         this.size = getCursorLong(cursor, Document.COLUMN_SIZE);
-        this.icon = getCursorInt(cursor, Document.COLUMN_ICON);
+        this.icon = getCursorString(cursor, Document.COLUMN_ICON);
         this.path = getCursorString(cursor, Document.COLUMN_PATH);
         this.deriveFields();
     }

@@ -4,9 +4,11 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.hand.document.adapter.BaseHolder
 import com.hand.document.core.DocumentInfo
 import com.hand.document.provider.IconProvider
+import com.hand.document.util.GlideApp
 import com.hand.document.util.LogUtil
 import com.hand.file.R
 
@@ -26,11 +28,14 @@ class DocHolder(itemView: View) : BaseHolder<DocumentInfo>(itemView) {
     private var more: View? = itemView.findViewById(R.id.more)
 
     override fun setData(data: DocumentInfo?) {
-        this.title!!.text = data!!.displayName
-        this.desc!!.text = data!!.summary
-        this.image?.apply {
-            LogUtil.d(TAG, "setImageDrawable with ${data.documentId} , mimeType ${data.mimeType}")
-            setImageDrawable(IconProvider.getDefDrawable(context, data.mimeType))
+        data?.let {
+            this.title!!.text = data.displayName
+            this.desc!!.text = data.summary
+            this.image?.apply {
+                LogUtil.d(TAG, "setImageDrawable with ${data.documentId} , mimeType ${data.mimeType}")
+                var uri = data.icon ?: data.path
+                GlideApp.with(this).load(uri).placeholder(IconProvider.getDefDrawable(context, data.mimeType)).into(this)
+            }
         }
     }
 

@@ -1,6 +1,9 @@
 package com.hand.document.provider;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.util.ArrayMap;
 import androidx.core.content.ContextCompat;
@@ -198,5 +201,24 @@ public class IconProvider {
             icon = R.drawable.ic_doc_document;
         }
         return ContextCompat.getDrawable(context, icon);
+    }
+
+    public static Drawable getApkIcon(Context context, String apkPath) {
+        PackageManager pm = context.getPackageManager();
+        PackageInfo info = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
+        if (info != null) {
+            ApplicationInfo appInfo = info.applicationInfo;
+            appInfo.sourceDir = apkPath;
+            appInfo.publicSourceDir = apkPath;
+            if (appInfo.icon <= 0) {
+                return null;
+            }
+            try {
+                return appInfo.loadIcon(pm);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }

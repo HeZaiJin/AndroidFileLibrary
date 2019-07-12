@@ -76,7 +76,7 @@ public class MediaDocumentsProvider extends StorageProvider {
 
     private static final String[] DEFAULT_DOCUMENT_PROJECTION = new String[]{
             Document.COLUMN_DOCUMENT_ID, Document.COLUMN_MIME_TYPE, Document.COLUMN_PATH, Document.COLUMN_DISPLAY_NAME,
-            Document.COLUMN_LAST_MODIFIED, Document.COLUMN_FLAGS, Document.COLUMN_SIZE,
+            Document.COLUMN_LAST_MODIFIED, Document.COLUMN_FLAGS, Document.COLUMN_SIZE, Document.COLUMN_ICON,
     };
 
     private static final String IMAGE_MIME_TYPES = joinNewline("image/*");
@@ -324,7 +324,7 @@ public class MediaDocumentsProvider extends StorageProvider {
             if (TYPE_IMAGES_ROOT.equals(ident.type)) {
                 // include all unique buckets
                 cursor = resolver.query(Images.Media.EXTERNAL_CONTENT_URI,
-                        ImagesBucketQuery.PROJECTION, null, null, ImagesBucketQuery.SORT_ORDER);
+                        ImagesBucketQuery.PROJECTION, " 1=1) group by (" + MediaStore.Images.Media.BUCKET_DISPLAY_NAME, null, ImagesBucketQuery.SORT_ORDER);
                 // multiple orders
                 copyNotificationUri(result, Images.Media.EXTERNAL_CONTENT_URI);
                 long lastId = Long.MIN_VALUE;
@@ -650,17 +650,32 @@ public class MediaDocumentsProvider extends StorageProvider {
         row.add(Document.COLUMN_FLAGS, flags);
     }
 
+    public static String[] PROJECTION_BUCKET = new String[]{
+            MediaStore.MediaColumns._ID,
+            MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+            MediaStore.Images.Media.DATA,
+            MediaStore.Images.Media.BUCKET_ID,
+            MediaStore.Images.Media.DATE_MODIFIED,
+            "count("+MediaStore.Images.Media._ID+")"//统计当前文件夹下共有多少张图片
+    };
+
+
     private interface ImagesBucketQuery {
         String[] PROJECTION = new String[]{
                 ImageColumns.BUCKET_ID,
                 ImageColumns.BUCKET_DISPLAY_NAME,
-                ImageColumns.DATE_MODIFIED};
-        String SORT_ORDER = ImageColumns.BUCKET_ID + ", " + ImageColumns.DATE_MODIFIED
+                ImageColumns.DATE_MODIFIED,
+                MediaStore.Images.Media.DATA,
+                "count("+MediaStore.Images.Media._ID+")"//统计当前文件夹下共有多少张图片
+        };
+        String SORT_ORDER = /*ImageColumns.BUCKET_ID + ", " + */ImageColumns.DATE_MODIFIED
                 + " DESC";
 
         int BUCKET_ID = 0;
         int BUCKET_DISPLAY_NAME = 1;
         int DATE_MODIFIED = 2;
+        int BUCKET_DISPLAY_ICON = 3;
+        int BUCKET_count = 4;
     }
 
     private void includeImagesBucket(MatrixCursor result, Cursor cursor) {
@@ -669,11 +684,13 @@ public class MediaDocumentsProvider extends StorageProvider {
 
         final MatrixCursor.RowBuilder row = result.newRow();
         row.add(Document.COLUMN_DOCUMENT_ID, docId);
-        row.add(Document.COLUMN_DISPLAY_NAME,
-                cursor.getString(ImagesBucketQuery.BUCKET_DISPLAY_NAME));
         row.add(Document.COLUMN_MIME_TYPE, Document.MIME_TYPE_DIR);
         row.add(Document.COLUMN_LAST_MODIFIED,
                 cursor.getLong(ImagesBucketQuery.DATE_MODIFIED) * DateUtils.SECOND_IN_MILLIS);
+        row.add(Document.COLUMN_ICON, cursor.getString(ImagesBucketQuery.BUCKET_DISPLAY_ICON));
+        row.add(Document.COLUMN_SIZE, cursor.getInt(ImagesBucketQuery.BUCKET_count));
+        row.add(Document.COLUMN_DISPLAY_NAME,
+                cursor.getString(ImagesBucketQuery.BUCKET_DISPLAY_NAME));
         int flags = Document.FLAG_SUPPORTS_THUMBNAIL | Document.FLAG_DIR_PREFERS_LAST_MODIFIED
                 | Document.FLAG_SUPPORTS_DELETE;
         row.add(Document.COLUMN_FLAGS, flags);
