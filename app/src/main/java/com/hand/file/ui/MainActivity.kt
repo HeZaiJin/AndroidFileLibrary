@@ -52,6 +52,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             R.id.auto -> {
                 DocumentActivity.start(this@MainActivity, Providers.ROOT_AUDIO, null)
             }
+            R.id.documents -> {
+                DocumentActivity.start(this@MainActivity, Providers.ROOT_DOCUMENTS, null)
+            }
+
         }
         LogUtil.d(TAG, "onClick end ")
     }

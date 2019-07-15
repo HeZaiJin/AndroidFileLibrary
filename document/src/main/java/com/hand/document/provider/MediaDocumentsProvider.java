@@ -49,6 +49,8 @@ import com.hand.document.provider.DocumentsContract.Root;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import static com.hand.document.provider.Providers.DOCUMENTS_URI;
+
 //import dev.dworks.apps.anexplorer.BuildConfig;
 //import dev.dworks.apps.anexplorer.R;
 //import dev.dworks.apps.anexplorer.cursor.MatrixCursor;
@@ -76,7 +78,7 @@ public class MediaDocumentsProvider extends StorageProvider {
 
     private static final String[] DEFAULT_DOCUMENT_PROJECTION = new String[]{
             Document.COLUMN_DOCUMENT_ID, Document.COLUMN_MIME_TYPE, Document.COLUMN_PATH, Document.COLUMN_DISPLAY_NAME,
-            Document.COLUMN_LAST_MODIFIED, Document.COLUMN_FLAGS, Document.COLUMN_SIZE, Document.COLUMN_ICON,
+            Document.COLUMN_LAST_MODIFIED, Document.COLUMN_FLAGS, Document.COLUMN_SIZE, Document.COLUMN_ICON, Document.COLUMN_SUMMARY,
     };
 
     private static final String IMAGE_MIME_TYPES = joinNewline("image/*");
@@ -85,6 +87,69 @@ public class MediaDocumentsProvider extends StorageProvider {
 
     private static final String AUDIO_MIME_TYPES = joinNewline(
             "audio/*", "application/ogg", "application/x-flac");
+
+    private static final String[] DOCUMENT_MIMES =
+            new String[]{
+                    "application/pdf",
+                    "application/epub+zip",
+                    "application/msword",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+                    "application/vnd.ms-excel",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
+                    "application/vnd.ms-powerpoint",
+                    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                    "application/vnd.openxmlformats-officedocument.presentationml.template",
+                    "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+                    "application/vnd.oasis.opendocument.text",
+                    "application/vnd.oasis.opendocument.text-master",
+                    "application/vnd.oasis.opendocument.text-template",
+                    "application/vnd.oasis.opendocument.text-web",
+                    "application/vnd.stardivision.writer",
+                    "application/vnd.stardivision.writer-global",
+                    "application/vnd.sun.xml.writer",
+                    "application/vnd.sun.xml.writer.global",
+                    "application/vnd.sun.xml.writer.template",
+                    "application/x-abiword",
+                    "application/x-kword",
+            };
+
+    private static final String[] ARCHIVE_MIMES =
+            new String[]{
+                    "application/mac-binhex40",
+                    "application/rar",
+                    "application/zip",
+                    "application/x-apple-diskimage",
+                    "application/x-debian-package",
+                    "application/x-gtar",
+                    "application/x-iso9660-image",
+                    "application/x-lha",
+                    "application/x-lzh",
+                    "application/x-lzx",
+                    "application/x-stuffit",
+                    "application/x-tar",
+                    "application/x-webarchive",
+                    "application/x-webarchive-xml",
+                    "application/gzip",
+                    "application/x-7z-compressed",
+                    "application/x-deb",
+                    "application/x-rar-compressed"
+            };
+
+    private static final String[] APK_MIMES =
+            new String[]{
+                    "application/vnd.android.package-archive"
+            };
+
+    private static final String DOCUMENT_MIME_TYPES =
+            joinNewline(DOCUMENT_MIMES);
+
+    private static final String ARCHIVE_MIME_TYPES =
+            joinNewline(ARCHIVE_MIMES);
+
+    private static final String APK_MIME_TYPES =
+            joinNewline(APK_MIMES);
 
     public static final String TYPE_IMAGES_ROOT = Providers.ROOT_IMAGE;
     public static final String TYPE_IMAGES_BUCKET = "images_bucket";
@@ -98,6 +163,9 @@ public class MediaDocumentsProvider extends StorageProvider {
     public static final String TYPE_AUDIO = "audio";
     public static final String TYPE_ARTIST = "artist";
     public static final String TYPE_ALBUM = "album";
+
+    public static final String TYPE_DOCUMENTS_ROOT = Providers.ROOT_DOCUMENTS;
+    public static final String TYPE_DOCUMENTS = "documents";
 
     private static boolean sReturnedImagesEmpty = false;
     private static boolean sReturnedVideosEmpty = false;
@@ -211,12 +279,109 @@ public class MediaDocumentsProvider extends StorageProvider {
         return projection != null ? projection : DEFAULT_DOCUMENT_PROJECTION;
     }
 
+
+    private void includeDocumentsRoot(MatrixCursor result) {
+        int flags = Root.FLAG_LOCAL_ONLY;
+        if (isEmpty(DOCUMENTS_URI)) {
+            flags |= Root.FLAG_EMPTY;
+            sReturnedAudioEmpty = true;
+        }
+
+        final MatrixCursor.RowBuilder row = result.newRow();
+        row.add(Root.COLUMN_ROOT_ID, TYPE_DOCUMENTS_ROOT);
+        row.add(Root.COLUMN_FLAGS, flags);
+        row.add(Root.COLUMN_TITLE, getContext().getString(R.string.root_documents));
+        row.add(Root.COLUMN_DOCUMENT_ID, TYPE_DOCUMENTS_ROOT);
+        row.add(Root.COLUMN_MIME_TYPES, DOCUMENT_MIME_TYPES);
+    }
+
+    private void includeDocumentsRootDocument(MatrixCursor result) {
+        final MatrixCursor.RowBuilder row = result.newRow();
+        row.add(Document.COLUMN_DOCUMENT_ID, TYPE_DOCUMENTS_ROOT);
+        row.add(Document.COLUMN_DISPLAY_NAME, getContext().getString(R.string.root_documents));
+        int flags = Document.FLAG_DIR_PREFERS_LAST_MODIFIED | Document.FLAG_SUPPORTS_DELETE;
+        row.add(Document.COLUMN_FLAGS, flags);
+        row.add(Document.COLUMN_MIME_TYPE, Document.MIME_TYPE_DIR);
+    }
+    private void includeFileRootDocument(MatrixCursor result, String root_type, int name_id) {
+        final MatrixCursor.RowBuilder row = result.newRow();
+        row.add(Document.COLUMN_DOCUMENT_ID, root_type);
+        row.add(Document.COLUMN_DISPLAY_NAME, getContext().getString(name_id));
+        int flags = Document.FLAG_DIR_PREFERS_LAST_MODIFIED | Document.FLAG_SUPPORTS_DELETE;
+        row.add(Document.COLUMN_FLAGS, flags);
+        row.add(Document.COLUMN_MIME_TYPE, Document.MIME_TYPE_DIR);
+    }
+    private void includeFileRoot(MatrixCursor result, String root_type, int name_id,
+                                 String mime_types, boolean supports_recent) {
+        int flags = Root.FLAG_LOCAL_ONLY;
+        if (isEmpty(DOCUMENTS_URI, root_type)) {
+            flags |= Root.FLAG_EMPTY;
+        }
+
+        if(supports_recent){
+            flags |= Root.FLAG_SUPPORTS_RECENTS;
+        }
+        final MatrixCursor.RowBuilder row = result.newRow();
+        row.add(Root.COLUMN_ROOT_ID, root_type);
+        row.add(Root.COLUMN_FLAGS, flags);
+        row.add(Root.COLUMN_TITLE, getContext().getString(name_id));
+        row.add(Root.COLUMN_DOCUMENT_ID, root_type);
+        row.add(Root.COLUMN_MIME_TYPES, mime_types);
+    }
+
+    private interface FileQuery {
+        String[] PROJECTION = new String[] {
+                FileColumns._ID,
+                FileColumns.TITLE,
+                FileColumns.MIME_TYPE,
+                FileColumns.SIZE,
+                FileColumns.DATA,
+                FileColumns.DATE_MODIFIED };
+
+        int _ID = 0;
+        int TITLE = 1;
+        int MIME_TYPE = 2;
+        int SIZE = 3;
+        int DATA = 4;
+        int DATE_MODIFIED = 5;
+    }
+
+    private void queryLikeFile(ContentResolver resolver, Cursor cursor, MatrixCursor result, String[] mimeType, String like) {
+        // single file
+        cursor = resolver.query(DOCUMENTS_URI,
+                FileQuery.PROJECTION,
+                FileColumns.MIME_TYPE + " IN "+ "("+toString(mimeType)+")"
+                        + " OR " + FileColumns.MIME_TYPE + " LIKE "+ "'"+like+"%'",
+                null,
+                null);
+        copyNotificationUri(result, DOCUMENTS_URI);
+        while (cursor.moveToNext()) {
+            includeFile(result, cursor, TYPE_DOCUMENTS);
+        }
+    }
+
+    private void includeFile(MatrixCursor result, Cursor cursor, String type) {
+        final long id = cursor.getLong(FileQuery._ID);
+        final String docId = getDocIdForIdent(type, id);
+
+        final MatrixCursor.RowBuilder row = result.newRow();
+        row.add(Document.COLUMN_DOCUMENT_ID, docId);
+        row.add(Document.COLUMN_DISPLAY_NAME, cursor.getString(FileQuery.TITLE));
+        row.add(Document.COLUMN_SIZE, cursor.getLong(FileQuery.SIZE));
+        row.add(Document.COLUMN_MIME_TYPE, cursor.getString(FileQuery.MIME_TYPE));
+        row.add(Document.COLUMN_PATH, cursor.getString(FileQuery.DATA));
+        row.add(Document.COLUMN_LAST_MODIFIED,
+                cursor.getLong(FileQuery.DATE_MODIFIED) * DateUtils.SECOND_IN_MILLIS);
+        row.add(Document.COLUMN_FLAGS, Document.FLAG_SUPPORTS_THUMBNAIL | Document.FLAG_SUPPORTS_DELETE);
+    }
+
     @Override
     public Cursor queryRoots(String[] projection) throws FileNotFoundException {
         final MatrixCursor result = new MatrixCursor(resolveRootProjection(projection));
         includeImagesRoot(result);
         includeVideosRoot(result);
         includeAudioRoot(result);
+        includeFileRoot(result,TYPE_DOCUMENTS_ROOT, R.string.root_documents, DOCUMENT_MIME_TYPES, true);
         return result;
     }
 
@@ -229,7 +394,11 @@ public class MediaDocumentsProvider extends StorageProvider {
         final long token = Binder.clearCallingIdentity();
         Cursor cursor = null;
         try {
-            if (TYPE_IMAGES_ROOT.equals(ident.type)) {
+            if (TYPE_DOCUMENTS_ROOT.equals(ident.type)) {
+                includeFileRootDocument(result, TYPE_DOCUMENTS_ROOT, R.string.root_documents);
+            } else if (TYPE_DOCUMENTS.equals(ident.type)) {
+                queryLikeFile(resolver, cursor, result, DOCUMENT_MIMES, "text");
+            } else if (TYPE_IMAGES_ROOT.equals(ident.type)) {
                 // single root
                 includeImagesRootDocument(result);
             } else if (TYPE_IMAGES_BUCKET.equals(ident.type)) {
@@ -321,7 +490,9 @@ public class MediaDocumentsProvider extends StorageProvider {
         final long token = Binder.clearCallingIdentity();
         Cursor cursor = null;
         try {
-            if (TYPE_IMAGES_ROOT.equals(ident.type)) {
+            if (TYPE_DOCUMENTS_ROOT.equals(ident.type)) {
+                queryLikeFile(resolver, cursor, result, DOCUMENT_MIMES, "text");
+            } else if (TYPE_IMAGES_ROOT.equals(ident.type)) {
                 // include all unique buckets
                 cursor = resolver.query(Images.Media.EXTERNAL_CONTENT_URI,
                         ImagesBucketQuery.PROJECTION, " 1=1) group by (" + MediaStore.Images.Media.BUCKET_DISPLAY_NAME, null, ImagesBucketQuery.SORT_ORDER);
@@ -575,6 +746,26 @@ public class MediaDocumentsProvider extends StorageProvider {
             Binder.restoreCallingIdentity(token);
         }
     }
+    private boolean isEmpty(Uri uri, String type) {
+        final ContentResolver resolver = getContext().getContentResolver();
+        final long token = Binder.clearCallingIdentity();
+        Cursor cursor = null;
+        try {
+            String[] mimeType;
+            if (TYPE_DOCUMENTS_ROOT.equals(type)) {
+                mimeType = DOCUMENT_MIMES;
+            } else {
+                return true;
+            }
+            cursor = resolver.query(DOCUMENTS_URI,
+                    FileQuery.PROJECTION,
+                    FileColumns.MIME_TYPE + " IN "+ "("+toString(mimeType)+")" , null, null);
+            return (cursor == null) || (cursor.getCount() == 0);
+        } finally {
+            IoUtils.closeQuietly(cursor);
+            Binder.restoreCallingIdentity(token);
+        }
+    }
 
     private void includeImagesRoot(MatrixCursor result) {
         int flags = Root.FLAG_LOCAL_ONLY | Root.FLAG_SUPPORTS_RECENTS;
@@ -656,7 +847,7 @@ public class MediaDocumentsProvider extends StorageProvider {
             MediaStore.Images.Media.DATA,
             MediaStore.Images.Media.BUCKET_ID,
             MediaStore.Images.Media.DATE_MODIFIED,
-            "count("+MediaStore.Images.Media._ID+")"//统计当前文件夹下共有多少张图片
+            "count(" + MediaStore.Images.Media._ID + ")"//统计当前文件夹下共有多少张图片
     };
 
 
@@ -666,7 +857,7 @@ public class MediaDocumentsProvider extends StorageProvider {
                 ImageColumns.BUCKET_DISPLAY_NAME,
                 ImageColumns.DATE_MODIFIED,
                 MediaStore.Images.Media.DATA,
-                "count("+MediaStore.Images.Media._ID+")"//统计当前文件夹下共有多少张图片
+                "count(" + MediaStore.Images.Media._ID + ")"//统计当前文件夹下共有多少张图片
         };
         String SORT_ORDER = /*ImageColumns.BUCKET_ID + ", " + */ImageColumns.DATE_MODIFIED
                 + " DESC";
@@ -688,7 +879,7 @@ public class MediaDocumentsProvider extends StorageProvider {
         row.add(Document.COLUMN_LAST_MODIFIED,
                 cursor.getLong(ImagesBucketQuery.DATE_MODIFIED) * DateUtils.SECOND_IN_MILLIS);
         row.add(Document.COLUMN_ICON, cursor.getString(ImagesBucketQuery.BUCKET_DISPLAY_ICON));
-        row.add(Document.COLUMN_SIZE, cursor.getInt(ImagesBucketQuery.BUCKET_count));
+        row.add(Document.COLUMN_SUMMARY, getContext().getResources().getString(R.string.directory_counts, String.valueOf(cursor.getInt(ImagesBucketQuery.BUCKET_count))));
         row.add(Document.COLUMN_DISPLAY_NAME,
                 cursor.getString(ImagesBucketQuery.BUCKET_DISPLAY_NAME));
         int flags = Document.FLAG_SUPPORTS_THUMBNAIL | Document.FLAG_DIR_PREFERS_LAST_MODIFIED
@@ -872,5 +1063,20 @@ public class MediaDocumentsProvider extends StorageProvider {
             return displayName;
         }
         return displayName;//getContext().getResources().getString(com.android.internal.R.string.unknownName);
+    }
+    public static String toString(String[] list) {
+        if (list == null) {
+            return "";
+        }
+        if (list.length == 0) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("'"+list[0]+"'");
+        for (int i = 1; i < list.length; i++) {
+            sb.append(", ");
+            sb.append("'"+list[i]+"'");
+        }
+        return sb.toString();
     }
 }

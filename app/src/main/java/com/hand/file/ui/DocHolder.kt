@@ -39,6 +39,14 @@ class DocHolder(itemView: View) : BaseHolder<DocumentInfo>(itemView) {
         }
     }
 
+    private fun setSummary(data: DocumentInfo, desc: TextView) {
+        if (data.isDirectory) {
+
+        } else {
+
+        }
+    }
+
     override fun setEditState(editing: Boolean) {
         checkBox?.let {
             it.visibility = if (editing) View.VISIBLE else View.INVISIBLE

@@ -3,6 +3,7 @@ package com.hand.document.provider;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.MediaStore;
 import androidx.annotation.IntDef;
 import androidx.annotation.LongDef;
 import androidx.annotation.StringDef;
@@ -23,7 +24,7 @@ public class Providers {
     private static final Uri DOWNLOAD_ROOT_URI = Uri.parse("content://" + BuildConfig.APPLICATION_ID + ".downloads.documents/root");
 
     private static final Uri MEDIA_ROOT_URI = Uri.parse("content://" + BuildConfig.APPLICATION_ID + ".media.documents/root");
-
+    public static final Uri DOCUMENTS_URI = MediaStore.Files.getContentUri("external");
 
     @StringDef(value = {
             ROOT_LOCAL_STORAGE,

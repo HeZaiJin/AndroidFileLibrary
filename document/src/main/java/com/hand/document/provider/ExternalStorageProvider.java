@@ -314,7 +314,7 @@ public class ExternalStorageProvider extends StorageProvider {
         row.add(Document.COLUMN_PATH, file.getAbsolutePath());
         row.add(Document.COLUMN_FLAGS, flags);
         if (file.isDirectory() && null != file.list()) {
-            row.add(Document.COLUMN_SUMMARY, FileUtils.formatFileCount(file.list().length));
+            row.add(Document.COLUMN_SUMMARY, getContext().getResources().getString(R.string.directory_counts, String.valueOf(file.list().length))/*FileUtils.formatFileCount(file.list().length)*/);
         }
 
         // Only publish dates reasonably after epoch
