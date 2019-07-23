@@ -60,4 +60,14 @@
 
     <string name="directory_counts">%s items</string>
 
+    <string name="task_delete">Deleting</string>
+    <string name="task_copy">Copying</string>
+    <string name="task_move">Moving</string>
+    <string name="task_result_fail">Operation failure</string>
+    <string name="task_result_part_fail">Some operation failure</string>
+    <string name="task_result_success">Operation success</string>
+    <string name="task_result_cancel">Canceled</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="task_progress_desc">Progress %1d in %2d</string>
 </resources>

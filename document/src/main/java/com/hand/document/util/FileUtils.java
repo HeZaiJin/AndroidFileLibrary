@@ -1,6 +1,8 @@
 package com.hand.document.util;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
@@ -14,6 +16,7 @@ import androidx.documentfile.provider.DocumentFile;
 import com.hand.document.R;
 import com.hand.document.io.IoUtils;
 import com.hand.document.provider.DocumentsContract;
+import com.hand.document.provider.Providers;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -787,7 +790,7 @@ public class FileUtils {
 
     public static boolean moveDocument(Context context, DocumentFile fileFrom, DocumentFile fileTo) {
 
-        if (fileTo.isDirectory() /*&& fileTo.canWrite()*/) {
+        if (fileTo.isDirectory() && fileTo.canWrite()) {
             if (fileFrom.isFile()) {
                 return copyDocument(context, fileFrom, fileTo);
             } else if (fileFrom.isDirectory()) {
@@ -919,4 +922,43 @@ public class FileUtils {
         }
         return null;
     }
+
+    public static void updateMediaStore(Context context, String path) {
+        try {
+            if (BuildUtils.hasKitKat()) {
+                FileUtils.updateMediaStore(context, new String[]{path});
+            } else {
+                Uri contentUri = Uri.fromFile(new File(path).getParentFile());
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri);
+                context.sendBroadcast(mediaScanIntent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void removeMediaStore(Context context, File file) {
+        try {
+            final ContentResolver resolver = context.getContentResolver();
+
+            // Remove media store entries for any files inside this directory, using
+            // path prefix match. Logic borrowed from MtpDatabase.
+            if (file.isDirectory()) {
+                final String path = file.getAbsolutePath() + "/";
+                resolver.delete(Providers.DOCUMENTS_URI,
+                        "_data LIKE ?1 AND lower(substr(_data,1,?2))=lower(?3)",
+                        new String[]{path + "%", Integer.toString(path.length()), path});
+            }
+
+            // Remove media store entry for this exact file.
+            final String path = file.getAbsolutePath();
+            resolver.delete(Providers.DOCUMENTS_URI,
+                    "_data LIKE ?1 AND lower(_data)=lower(?2)",
+                    new String[]{path, path});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

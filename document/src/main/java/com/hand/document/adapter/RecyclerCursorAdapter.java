@@ -1,7 +1,10 @@
 package com.hand.document.adapter;
 
 import android.database.Cursor;
+import android.util.SparseBooleanArray;
 import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
 
 public abstract class RecyclerCursorAdapter<T, VH extends BaseHolder<T>> extends MultiChoiceAdapter<VH> {
 
@@ -45,5 +48,17 @@ public abstract class RecyclerCursorAdapter<T, VH extends BaseHolder<T>> extends
     @Override
     public boolean isEmpty() {
         return isLoaded && mCursorCount == 0;
+    }
+
+    public ArrayList<T> getCheckItems() {
+        SparseBooleanArray checkedItemPositions = getCheckedItemPositions();
+        int size = checkedItemPositions.size();
+        ArrayList<T> list = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            if (checkedItemPositions.valueAt(i)) {
+                list.add(getItem(checkedItemPositions.keyAt(i)));
+            }
+        }
+        return list;
     }
 }

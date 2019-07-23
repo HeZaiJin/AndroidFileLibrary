@@ -16,6 +16,10 @@ import com.google.android.material.appbar.AppBarLayout
 import com.hand.document.core.DocumentInfo
 import com.hand.document.core.DocumentState
 import com.hand.document.core.RootInfo
+import com.hand.document.operation.BaseTask
+import com.hand.document.operation.DeleteTask
+import com.hand.document.operation.TaskProgress
+import com.hand.document.operation.TaskResult
 import com.hand.document.provider.Providers
 import com.hand.document.util.BuildUtils
 import com.hand.document.util.LogUtil
@@ -26,7 +30,8 @@ import com.hand.file.setupActionBar
 /**
  * TODO Document Stack
  */
-class DocumentActivity : AppCompatActivity()/*, FolderNavigationBar.NavigateListener<DocumentInfo>*/ {
+class DocumentActivity : AppCompatActivity(),
+    BaseTask.Observer/*, FolderNavigationBar.NavigateListener<DocumentInfo>*/ {
 
     companion object {
         var TAG = "DocumentActivity"
@@ -216,5 +221,23 @@ class DocumentActivity : AppCompatActivity()/*, FolderNavigationBar.NavigateList
         for (doc in state.mStack) {
             Log.d(TAG, " +-- $doc")
         }
+    }
+
+    fun deleteDocuments(list: ArrayList<DocumentInfo>) {
+        if (list.isNotEmpty()) {
+            DeleteTask(this, list).run(this)
+        }
+    }
+
+    override fun onTaskStart() {
+        Log.d(TAG, "onTaskStart")
+    }
+
+    override fun onTaskProgress(progress: TaskProgress) {
+        Log.d(TAG, "onTaskProgress progress ${progress.progress}, max ${progress.max}")
+    }
+
+    override fun onTaskComplete(result: TaskResult) {
+        Log.d(TAG, "onTaskComplete state ${result.state}, msg ${result.msg}")
     }
 }

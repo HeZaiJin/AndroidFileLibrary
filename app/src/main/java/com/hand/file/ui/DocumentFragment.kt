@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.appcompat.view.ActionMode
-import androidx.documentfile.provider.DocumentFile
+import androidx.core.util.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.loader.app.LoaderManager
@@ -19,9 +19,14 @@ import com.hand.document.core.DirectoryLoader
 import com.hand.document.core.DirectoryResult
 import com.hand.document.core.DocumentInfo
 import com.hand.document.core.RootInfo
+import com.hand.document.operation.DeleteTask
 import com.hand.document.util.LogUtil
 import com.hand.file.R
 import com.hand.file.ui.widget.BottomChooseDialog
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
 
 
 /**
@@ -172,7 +177,9 @@ class DocumentFragment : Fragment(), MultiChoiceHelper.MultiChoiceListener, Docu
                 }
                 return false
             }
+
             R.id.menu_delete -> {
+                (activity as DocumentActivity).deleteDocuments(adapter.checkItems)
                 return true
             }
             R.id.menu_copy -> {

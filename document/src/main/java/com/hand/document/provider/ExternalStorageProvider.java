@@ -12,7 +12,6 @@ import android.util.Log;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
-import androidx.core.os.EnvironmentCompat;
 import androidx.documentfile.provider.DocumentFile;
 import com.hand.document.BuildConfig;
 import com.hand.document.R;
@@ -509,6 +508,24 @@ public class ExternalStorageProvider extends StorageProvider {
         public String toString() {
             return "DirectoryObserver{file=" + mFile.getAbsolutePath() + ", ref=" + mRefCount + "}";
         }
+    }
+
+    @Override
+    public void deleteDocument(String docId) throws FileNotFoundException {
+        final File file = getFileForDocId(docId);
+        DocumentFile documentFile = getDocumentFile(docId, file);
+
+        if (!documentFile.delete()) {
+            throw new IllegalStateException("Failed to delete " + file);
+        }
+
+        FileUtils.removeMediaStore(getContext(), file);
+        notifyDocumentsChanged(getContext(), docId);
+    }
+
+
+    private DocumentFile getDocumentFile(String docId, File file) throws FileNotFoundException {
+        return SAFManager.getDocumentFile(getContext(), docId, file);
     }
 
 }

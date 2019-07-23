@@ -22,6 +22,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.mtp.MtpConstants;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
@@ -166,6 +167,9 @@ public class MediaDocumentsProvider extends StorageProvider {
 
     public static final String TYPE_DOCUMENTS_ROOT = Providers.ROOT_DOCUMENTS;
     public static final String TYPE_DOCUMENTS = "documents";
+
+    public static final String TYPE_DOWNLOAD_ROOT = Providers.ROOT_DOWNLOADS;
+    public static final String TYPE_DOWNLOAD = "download";
 
     private static boolean sReturnedImagesEmpty = false;
     private static boolean sReturnedVideosEmpty = false;
@@ -326,7 +330,7 @@ public class MediaDocumentsProvider extends StorageProvider {
         row.add(Root.COLUMN_FLAGS, flags);
         row.add(Root.COLUMN_TITLE, getContext().getString(name_id));
         row.add(Root.COLUMN_DOCUMENT_ID, root_type);
-        row.add(Root.COLUMN_MIME_TYPES, mime_types);
+//        row.add(Root.COLUMN_MIME_TYPES, mime_types);
     }
 
     private interface FileQuery {
@@ -360,6 +364,19 @@ public class MediaDocumentsProvider extends StorageProvider {
         }
     }
 
+    private void queryLikeFile(ContentResolver resolver, Cursor cursor, MatrixCursor result, String selection, String[] args) {
+        // single file
+        cursor = resolver.query(DOCUMENTS_URI,
+                FileQuery.PROJECTION,
+                selection,
+                args,
+                null);
+        copyNotificationUri(result, DOCUMENTS_URI);
+        while (cursor.moveToNext()) {
+            includeFile(result, cursor, TYPE_DOWNLOAD);
+        }
+    }
+
     private void includeFile(MatrixCursor result, Cursor cursor, String type) {
         final long id = cursor.getLong(FileQuery._ID);
         final String docId = getDocIdForIdent(type, id);
@@ -382,6 +399,7 @@ public class MediaDocumentsProvider extends StorageProvider {
         includeVideosRoot(result);
         includeAudioRoot(result);
         includeFileRoot(result,TYPE_DOCUMENTS_ROOT, R.string.root_documents, DOCUMENT_MIME_TYPES, true);
+        includeFileRoot(result,TYPE_DOWNLOAD_ROOT, R.string.root_downloads, null, true);
         return result;
     }
 
@@ -398,6 +416,10 @@ public class MediaDocumentsProvider extends StorageProvider {
                 includeFileRootDocument(result, TYPE_DOCUMENTS_ROOT, R.string.root_documents);
             } else if (TYPE_DOCUMENTS.equals(ident.type)) {
                 queryLikeFile(resolver, cursor, result, DOCUMENT_MIMES, "text");
+            } else if (TYPE_DOWNLOAD_ROOT.equals(ident.type)) {
+                includeFileRoot(result, TYPE_DOWNLOAD_ROOT, R.string.root_downloads, null, true);
+            } else if (TYPE_DOWNLOAD.equals(ident.type)) {
+                queryLikeFile(resolver, cursor, result, MediaStore.MediaColumns.DATA + " LIKE ? ", new String[]{"%.apk"});
             } else if (TYPE_IMAGES_ROOT.equals(ident.type)) {
                 // single root
                 includeImagesRootDocument(result);
@@ -492,6 +514,8 @@ public class MediaDocumentsProvider extends StorageProvider {
         try {
             if (TYPE_DOCUMENTS_ROOT.equals(ident.type)) {
                 queryLikeFile(resolver, cursor, result, DOCUMENT_MIMES, "text");
+            } else if (TYPE_DOWNLOAD_ROOT.equals(ident.type)) {
+                queryLikeFile(resolver, cursor, result, MediaStore.MediaColumns.DATA + " LIKE ? ", new String[]{"%.apk"});
             } else if (TYPE_IMAGES_ROOT.equals(ident.type)) {
                 // include all unique buckets
                 cursor = resolver.query(Images.Media.EXTERNAL_CONTENT_URI,

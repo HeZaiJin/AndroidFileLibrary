@@ -50,6 +50,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
+        <androidx.appcompat.widget.AppCompatButton
+                android:onClick="onClick"
+                android:id="@+id/internal"
+                android:text="@string/root_internal_storage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+                android:onClick="onClick"
+                android:id="@+id/external"
+                android:text="@string/root_external_storage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

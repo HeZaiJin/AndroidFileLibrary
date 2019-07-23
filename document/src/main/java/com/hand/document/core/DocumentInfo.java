@@ -227,7 +227,12 @@ public class DocumentInfo implements Durable, Parcelable {
 
     @Override
     public String toString() {
-        return "Document{docId=" + documentId + ", name=" + displayName + "}";
+        return "DocumentInfo{" +
+                "documentId='" + documentId + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", path='" + path + '\'' +
+                ", derivedUri=" + derivedUri +
+                '}';
     }
 
     public boolean isRootDirectory() {

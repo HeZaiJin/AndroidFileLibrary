@@ -10,6 +10,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.hand.document.core.RootInfo
 import com.hand.document.provider.Providers
 import com.hand.document.util.LogUtil
 import com.hand.file.R
@@ -18,6 +19,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     companion object {
         var TAG = "MainActivity"
     }
+
+    private lateinit var localRoots: List<RootInfo>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +41,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         navView.setNavigationItemSelectedListener(this)
+        localRoots = Providers.getLocalRoots(this)
     }
 
     fun onClick(view: View) {
@@ -54,6 +58,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             R.id.documents -> {
                 DocumentActivity.start(this@MainActivity, Providers.ROOT_DOCUMENTS, null)
+            }
+            R.id.downloads -> {
+                DocumentActivity.start(this@MainActivity, Providers.ROOT_DOWNLOADS, null)
+            }
+
+            R.id.internal -> {
+                DocumentActivity.start(this@MainActivity, Providers.ROOT_LOCAL_STORAGE, localRoots[0])
             }
 
         }
