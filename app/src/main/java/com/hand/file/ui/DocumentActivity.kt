@@ -16,10 +16,7 @@ import com.google.android.material.appbar.AppBarLayout
 import com.hand.document.core.DocumentInfo
 import com.hand.document.core.DocumentState
 import com.hand.document.core.RootInfo
-import com.hand.document.operation.BaseTask
-import com.hand.document.operation.DeleteTask
-import com.hand.document.operation.TaskProgress
-import com.hand.document.operation.TaskResult
+import com.hand.document.operation.*
 import com.hand.document.provider.Providers
 import com.hand.document.util.BuildUtils
 import com.hand.document.util.LogUtil
@@ -229,7 +226,7 @@ class DocumentActivity : AppCompatActivity(),
         }
     }
 
-    override fun onTaskStart() {
+    override fun onTaskStart(task: Task) {
         Log.d(TAG, "onTaskStart")
     }
 

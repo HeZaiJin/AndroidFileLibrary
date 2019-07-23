@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.hand.document.R;
 import com.hand.document.operation.Task;
+import com.hand.document.operation.TaskProgress;
 
 public class TaskProgressDialog extends BottomSheetDialog implements View.OnClickListener {
     private static final String TAG = "TaskProgressDialog";
@@ -40,7 +41,7 @@ public class TaskProgressDialog extends BottomSheetDialog implements View.OnClic
         mCancel.setClickable(true);
     }
 
-    public void udpate(Object obj) {
+    public void update(TaskProgress progress) {
 
     }
 

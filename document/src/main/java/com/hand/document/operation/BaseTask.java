@@ -15,7 +15,7 @@ public abstract class BaseTask extends AsyncTask<Void, TaskProgress, TaskResult>
     }
 
     @Override
-    protected TaskResult doInBackground(Void... voids) {
+    protected void onPreExecute() {
         Task task = generateTask();
         if (null != mObserver) {
             mObserver.onTaskStart(task);
@@ -23,7 +23,12 @@ public abstract class BaseTask extends AsyncTask<Void, TaskProgress, TaskResult>
 
         if (showProgressDialog()) {
             mProgressDialog = new TaskProgressDialog(mContext);
+            mProgressDialog.show(task);
         }
+    }
+
+    @Override
+    protected TaskResult doInBackground(Void... voids) {
 
         return null;
     }
@@ -48,6 +53,9 @@ public abstract class BaseTask extends AsyncTask<Void, TaskProgress, TaskResult>
         if (null != mObserver) {
             mObserver.onTaskComplete(taskResult);
         }
+        if (null != mProgressDialog) {
+            mProgressDialog.dismiss();
+        }
         release();
     }
 
@@ -60,6 +68,9 @@ public abstract class BaseTask extends AsyncTask<Void, TaskProgress, TaskResult>
     protected void onProgressUpdate(TaskProgress... values) {
         if (null != mObserver) {
             mObserver.onTaskProgress(values[0]);
+        }
+        if (null != mProgressDialog) {
+            mProgressDialog.update(values[0]);
         }
     }
 
