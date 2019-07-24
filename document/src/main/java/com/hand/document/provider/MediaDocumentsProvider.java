@@ -22,7 +22,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.mtp.MtpConstants;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
@@ -311,6 +310,7 @@ public class MediaDocumentsProvider extends StorageProvider {
         row.add(Document.COLUMN_FLAGS, flags);
         row.add(Document.COLUMN_MIME_TYPE, Document.MIME_TYPE_DIR);
     }
+
     private void includeFileRootDocument(MatrixCursor result, String root_type, int name_id) {
         final MatrixCursor.RowBuilder row = result.newRow();
         row.add(Document.COLUMN_DOCUMENT_ID, root_type);
@@ -319,6 +319,7 @@ public class MediaDocumentsProvider extends StorageProvider {
         row.add(Document.COLUMN_FLAGS, flags);
         row.add(Document.COLUMN_MIME_TYPE, Document.MIME_TYPE_DIR);
     }
+
     private void includeFileRoot(MatrixCursor result, String root_type, int name_id,
                                  String mime_types, boolean supports_recent) {
         int flags = Root.FLAG_LOCAL_ONLY;
@@ -326,7 +327,7 @@ public class MediaDocumentsProvider extends StorageProvider {
             flags |= Root.FLAG_EMPTY;
         }
 
-        if(supports_recent){
+        if (supports_recent) {
             flags |= Root.FLAG_SUPPORTS_RECENTS;
         }
         final MatrixCursor.RowBuilder row = result.newRow();
@@ -338,13 +339,13 @@ public class MediaDocumentsProvider extends StorageProvider {
     }
 
     private interface FileQuery {
-        String[] PROJECTION = new String[] {
+        String[] PROJECTION = new String[]{
                 FileColumns._ID,
                 FileColumns.TITLE,
                 FileColumns.MIME_TYPE,
                 FileColumns.SIZE,
                 FileColumns.DATA,
-                FileColumns.DATE_MODIFIED };
+                FileColumns.DATE_MODIFIED};
 
         int _ID = 0;
         int TITLE = 1;
@@ -358,8 +359,8 @@ public class MediaDocumentsProvider extends StorageProvider {
         // single file
         cursor = resolver.query(DOCUMENTS_URI,
                 FileQuery.PROJECTION,
-                FileColumns.MIME_TYPE + " IN "+ "("+toString(mimeType)+")"
-                        + " OR " + FileColumns.MIME_TYPE + " LIKE "+ "'"+like+"%'",
+                FileColumns.MIME_TYPE + " IN " + "(" + toString(mimeType) + ")"
+                        + " OR " + FileColumns.MIME_TYPE + " LIKE " + "'" + like + "%'",
                 null,
                 null);
         copyNotificationUri(result, DOCUMENTS_URI);
@@ -402,8 +403,8 @@ public class MediaDocumentsProvider extends StorageProvider {
         includeImagesRoot(result);
         includeVideosRoot(result);
         includeAudioRoot(result);
-        includeFileRoot(result,TYPE_DOCUMENTS_ROOT, R.string.root_documents, DOCUMENT_MIME_TYPES, true);
-        includeFileRoot(result,TYPE_DOWNLOAD_ROOT, R.string.root_downloads, null, true);
+        includeFileRoot(result, TYPE_DOCUMENTS_ROOT, R.string.root_documents, DOCUMENT_MIME_TYPES, true);
+        includeFileRoot(result, TYPE_DOWNLOAD_ROOT, R.string.root_downloads, null, true);
         return result;
     }
 
@@ -423,7 +424,8 @@ public class MediaDocumentsProvider extends StorageProvider {
             } else if (TYPE_DOWNLOAD_ROOT.equals(ident.type)) {
                 includeFileRoot(result, TYPE_DOWNLOAD_ROOT, R.string.root_downloads, null, true);
             } else if (TYPE_DOWNLOAD.equals(ident.type)) {
-                queryLikeFile(resolver, cursor, result, MediaStore.MediaColumns.DATA + " LIKE ? ", new String[]{"%.apk"});
+                queryLikeFile(resolver, cursor, result, FileColumns.MIME_TYPE + " != ? " + " AND "
+                        + FileColumns.DATA + " LIKE ? " , new String[]{Document.MIME_TYPE_DIR, "%/Download/%"});
             } else if (TYPE_IMAGES_ROOT.equals(ident.type)) {
                 // single root
                 includeImagesRootDocument(result);
@@ -519,7 +521,8 @@ public class MediaDocumentsProvider extends StorageProvider {
             if (TYPE_DOCUMENTS_ROOT.equals(ident.type)) {
                 queryLikeFile(resolver, cursor, result, DOCUMENT_MIMES, "text");
             } else if (TYPE_DOWNLOAD_ROOT.equals(ident.type)) {
-                queryLikeFile(resolver, cursor, result, MediaStore.MediaColumns.DATA + " LIKE ? ", new String[]{"%.apk"});
+                queryLikeFile(resolver, cursor, result, FileColumns.MIME_TYPE + " != ? " + " AND "
+                        + FileColumns.DATA + " LIKE ? " , new String[]{Document.MIME_TYPE_DIR, "%/Download/%"});
             } else if (TYPE_IMAGES_ROOT.equals(ident.type)) {
                 // include all unique buckets
                 cursor = resolver.query(Images.Media.EXTERNAL_CONTENT_URI,
@@ -677,6 +680,8 @@ public class MediaDocumentsProvider extends StorageProvider {
         } else if (TYPE_AUDIO.equals(ident.type) && ident.id != -1) {
             return ContentUris.withAppendedId(
                     Audio.Media.EXTERNAL_CONTENT_URI, ident.id);
+        } else if ((TYPE_DOCUMENTS.equals(ident.type) || TYPE_DOWNLOAD.equals(ident.type)) && ident.id != -1) {
+            return ContentUris.withAppendedId(DOCUMENTS_URI, ident.id);
         } else {
             throw new UnsupportedOperationException("Unsupported document " + docId);
         }
@@ -774,6 +779,7 @@ public class MediaDocumentsProvider extends StorageProvider {
             Binder.restoreCallingIdentity(token);
         }
     }
+
     private boolean isEmpty(Uri uri, String type) {
         final ContentResolver resolver = getContext().getContentResolver();
         final long token = Binder.clearCallingIdentity();
@@ -787,7 +793,7 @@ public class MediaDocumentsProvider extends StorageProvider {
             }
             cursor = resolver.query(DOCUMENTS_URI,
                     FileQuery.PROJECTION,
-                    FileColumns.MIME_TYPE + " IN "+ "("+toString(mimeType)+")" , null, null);
+                    FileColumns.MIME_TYPE + " IN " + "(" + toString(mimeType) + ")", null, null);
             return (cursor == null) || (cursor.getCount() == 0);
         } finally {
             IoUtils.closeQuietly(cursor);
@@ -1092,6 +1098,7 @@ public class MediaDocumentsProvider extends StorageProvider {
         }
         return displayName;//getContext().getResources().getString(com.android.internal.R.string.unknownName);
     }
+
     public static String toString(String[] list) {
         if (list == null) {
             return "";
@@ -1100,10 +1107,10 @@ public class MediaDocumentsProvider extends StorageProvider {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("'"+list[0]+"'");
+        sb.append("'" + list[0] + "'");
         for (int i = 1; i < list.length; i++) {
             sb.append(", ");
-            sb.append("'"+list[i]+"'");
+            sb.append("'" + list[i] + "'");
         }
         return sb.toString();
     }
