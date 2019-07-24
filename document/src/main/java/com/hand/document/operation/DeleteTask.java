@@ -10,6 +10,9 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author hand
+ */
 public class DeleteTask extends BaseTask {
 
     private ArrayList<DocumentInfo> mSourceDocs;
@@ -31,6 +34,9 @@ public class DeleteTask extends BaseTask {
             if (isCancelled()) {
                 return TaskResult.obtain(TaskResult.STATE_CANCEL, getContext().getString(R.string.task_result_cancel));
             }
+            ++index;
+            publishProgress(TaskProgress.obtain(index, max));
+
             try {
                 boolean result = DocumentsContract.deleteDocument(contentResolver, documentInfo.derivedUri);
                 if (!result) {
@@ -40,9 +46,6 @@ public class DeleteTask extends BaseTask {
                 e.printStackTrace();
                 failedList.add(documentInfo);
             }
-            ++index;
-            float progress = index / max;
-            publishProgress(TaskProgress.obtain(progress, max));
         }
 
         if (failedList.size() > 0) {

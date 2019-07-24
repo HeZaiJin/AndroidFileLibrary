@@ -69,7 +69,9 @@ public class FileUtils {
      * attacks.
      */
     public static boolean contains(File dir, File file) {
-        if (dir == null || file == null) return false;
+        if (dir == null || file == null) {
+            return false;
+        }
         String dirPath = dir.getAbsolutePath();
         String filePath = file.getAbsolutePath();
         if (dirPath.equals(filePath)) {
@@ -206,13 +208,17 @@ public class FileUtils {
     }
 
     public static String rewriteAfterRename(File beforeDir, File afterDir, String path) {
-        if (path == null) return null;
+        if (path == null) {
+            return null;
+        }
         final File result = rewriteAfterRename(beforeDir, afterDir, new File(path));
         return (result != null) ? result.getAbsolutePath() : null;
     }
 
     public static String[] rewriteAfterRename(File beforeDir, File afterDir, String[] paths) {
-        if (paths == null) return null;
+        if (paths == null) {
+            return null;
+        }
         final String[] result = new String[paths.length];
         for (int i = 0; i < paths.length; i++) {
             result[i] = rewriteAfterRename(beforeDir, afterDir, paths[i]);
@@ -226,7 +232,9 @@ public class FileUtils {
      * {@code /after/foo/bar.txt}.
      */
     public static File rewriteAfterRename(File beforeDir, File afterDir, File file) {
-        if (file == null || beforeDir == null || afterDir == null) return null;
+        if (file == null || beforeDir == null || afterDir == null) {
+            return null;
+        }
         if (contains(beforeDir, file)) {
             final String splice = file.getAbsolutePath().substring(
                     beforeDir.getAbsolutePath().length());
@@ -304,8 +312,9 @@ public class FileUtils {
         try {
             fi = new FileInputStream(file);
             if (!dest.exists()) {
-                if (!dest.mkdirs())
+                if (!dest.mkdirs()) {
                     return false;
+                }
             }
 
             File destFile = new File(dest, !TextUtils.isEmpty(name)
@@ -321,12 +330,14 @@ public class FileUtils {
                 destFile = new File(dest, destName);
             }
 
-            if (!destFile.createNewFile())
+            if (!destFile.createNewFile()) {
                 return false;
+            }
             bos = new BufferedOutputStream(new FileOutputStream(destFile));
             bis = new BufferedInputStream(new FileInputStream(file));
-            while ((read = bis.read(data, 0, BUFFER)) != -1)
+            while ((read = bis.read(data, 0, BUFFER)) != -1) {
                 bos.write(data, 0, read);
+            }
 
             return true;
         } catch (FileNotFoundException e) {
@@ -341,10 +352,12 @@ public class FileUtils {
                 bos.flush();
                 bis.close();
                 bos.close();
-                if (fi != null)
+                if (fi != null) {
                     fi.close();
-                if (fo != null)
+                }
+                if (fo != null) {
                     fo.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

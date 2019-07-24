@@ -56,7 +56,7 @@ public class ReflectUtils {
     }
 
     public static long getFiledLong(Object object, String id) {
-        long value = 0l;
+        long value = 0L;
         try {
             Field field = object.getClass().getDeclaredField(id);
             field.setAccessible(true);

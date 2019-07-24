@@ -193,7 +193,9 @@ public class MediaDocumentsProvider extends StorageProvider {
      * refresh to clear a previously reported {@link Root#FLAG_EMPTY}.
      */
     static void onMediaStoreInsert(Context context, String volumeName, int type, long id) {
-        if (!"external".equals(volumeName)) return;
+        if (!"external".equals(volumeName)) {
+            return;
+        }
 
         if (type == FileColumns.MEDIA_TYPE_IMAGE && sReturnedImagesEmpty) {
             sReturnedImagesEmpty = false;
@@ -211,7 +213,9 @@ public class MediaDocumentsProvider extends StorageProvider {
      * When deleting an item, we need to revoke any outstanding Uri grants.
      */
     static void onMediaStoreDelete(Context context, String volumeName, int type, long id) {
-        if (!"external".equals(volumeName)) return;
+        if (!"external".equals(volumeName)) {
+            return;
+        }
 
         if (type == FileColumns.MEDIA_TYPE_IMAGE) {
             final Uri uri = DocumentsContract.buildDocumentUri(

@@ -313,9 +313,13 @@ public class DocumentInfo implements Durable, Parcelable {
      */
     public static long getCursorLong(Cursor cursor, String columnName) {
         final int index = cursor.getColumnIndex(columnName);
-        if (index == -1) return -1;
+        if (index == -1) {
+            return -1;
+        }
         final String value = cursor.getString(index);
-        if (value == null) return -1;
+        if (value == null) {
+            return -1;
+        }
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException e) {
@@ -364,23 +368,37 @@ public class DocumentInfo implements Durable, Parcelable {
         final boolean leftEmpty = TextUtils.isEmpty(lhs);
         final boolean rightEmpty = TextUtils.isEmpty(rhs);
 
-        if (leftEmpty && rightEmpty) return 0;
-        if (leftEmpty) return -1;
-        if (rightEmpty) return 1;
+        if (leftEmpty && rightEmpty) {
+            return 0;
+        }
+        if (leftEmpty) {
+            return -1;
+        }
+        if (rightEmpty) {
+            return 1;
+        }
 
         final boolean leftDir = (lhs.charAt(0) == DIR_PREFIX);
         final boolean rightDir = (rhs.charAt(0) == DIR_PREFIX);
 
-        if (leftDir && !rightDir) return -1;
-        if (rightDir && !leftDir) return 1;
+        if (leftDir && !rightDir) {
+            return -1;
+        }
+        if (rightDir && !leftDir) {
+            return 1;
+        }
 
         return sCollator.compare(lhs, rhs);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         DocumentInfo that = (DocumentInfo) o;
         return authority.equals(that.authority) &&
                 documentId.equals(that.documentId) &&

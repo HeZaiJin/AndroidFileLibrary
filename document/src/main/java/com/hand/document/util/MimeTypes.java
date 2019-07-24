@@ -125,7 +125,9 @@ public final class MimeTypes {
 
         for (int i = 1; i < mimeTypes.size(); i++) {
             String[] type = mimeTypes.get(i).split("/");
-            if (type.length != 2) continue;
+            if (type.length != 2) {
+                continue;
+            }
 
             if (!commonType[1].equals(type[1])) {
                 commonType[1] = "*";

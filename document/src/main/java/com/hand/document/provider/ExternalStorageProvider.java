@@ -103,7 +103,9 @@ public class ExternalStorageProvider extends StorageProvider {
                 String state = volume.state;
                 final boolean mounted = Environment.MEDIA_MOUNTED.equals(state)
                         || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
-                if (!mounted) continue;
+                if (!mounted) {
+                    continue;
+                }
 
                 final String rootId;
                 final String title;
@@ -461,7 +463,9 @@ public class ExternalStorageProvider extends StorageProvider {
     private void stopObserving(File file) {
         synchronized (mObservers) {
             DirectoryObserver observer = mObservers.get(file);
-            if (observer == null) return;
+            if (observer == null) {
+                return;
+            }
 
             observer.mRefCount--;
             if (observer.mRefCount == 0) {

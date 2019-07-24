@@ -4,7 +4,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 import com.hand.document.operation.widget.TaskProgressDialog;
 
-public abstract class BaseTask extends AsyncTask<Void, TaskProgress, TaskResult> {
+/**
+ * @author hand
+ */
+public abstract class BaseTask extends AsyncTask<Void, TaskProgress, TaskResult> implements CancelAble{
 
     private Context mContext;
     private Observer mObserver;
@@ -23,7 +26,7 @@ public abstract class BaseTask extends AsyncTask<Void, TaskProgress, TaskResult>
 
         if (showProgressDialog()) {
             mProgressDialog = new TaskProgressDialog(mContext);
-            mProgressDialog.show(task);
+            mProgressDialog.show(task, this);
         }
     }
 
@@ -72,6 +75,23 @@ public abstract class BaseTask extends AsyncTask<Void, TaskProgress, TaskResult>
         if (null != mProgressDialog) {
             mProgressDialog.update(values[0]);
         }
+    }
+
+    @Override
+    protected void onCancelled(TaskResult result) {
+        super.onCancelled(result);
+        if (null != mObserver) {
+            mObserver.onTaskComplete(result);
+        }
+        if (null != mProgressDialog) {
+            mProgressDialog.dismiss();
+        }
+        release();
+    }
+
+    @Override
+    public void cancel() {
+        cancel(true);
     }
 
     public void run(Observer observer) {

@@ -173,9 +173,15 @@ public final class Shared {
         final boolean leftEmpty = TextUtils.isEmpty(lhs);
         final boolean rightEmpty = TextUtils.isEmpty(rhs);
 
-        if (leftEmpty && rightEmpty) return 0;
-        if (leftEmpty) return -1;
-        if (rightEmpty) return 1;
+        if (leftEmpty && rightEmpty) {
+            return 0;
+        }
+        if (leftEmpty) {
+            return -1;
+        }
+        if (rightEmpty) {
+            return 1;
+        }
 
         return sCollator.compare(lhs, rhs);
     }
