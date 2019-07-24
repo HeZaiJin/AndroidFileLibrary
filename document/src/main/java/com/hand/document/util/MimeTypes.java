@@ -28,6 +28,9 @@ public final class MimeTypes {
         MIME_TYPES.put("prop", "text/plain");
         MIME_TYPES.put("properties", "text/plain");
         MIME_TYPES.put("rc", "text/plain");
+        MIME_TYPES.put("kt", "text/plain");
+        MIME_TYPES.put("java", "text/plain");
+        MIME_TYPES.put("mhtml", "text/html");
 
         MIME_TYPES.put("epub", "application/epub+zip");
         MIME_TYPES.put("ibooks", "application/x-ibooks+zip");
@@ -104,6 +107,14 @@ public final class MimeTypes {
             }
         }
         return type;
+    }
+
+    public static String getMimeTypeFromPath(String path) {
+        String extension = MimeTypeMap.getFileExtensionFromUrl(path);
+        if (!TextUtils.isEmpty(extension)) {
+            return getMimeTypeFromExtension(extension);
+        }
+        return null;
     }
 
     public static @Nullable

@@ -32,11 +32,15 @@ class DocHolder(itemView: View) : BaseHolder<DocumentInfo>(itemView) {
             this.title!!.text = data.displayName
             this.desc!!.text = data.summary
             this.image?.apply {
-                LogUtil.d(TAG, "setImageDrawable with ${data.documentId} , mimeType ${data.mimeType}")
+                dump(data)
                 var uri = data.icon ?: data.path
                 GlideApp.with(this).load(uri).placeholder(IconProvider.getDefDrawable(context, data.mimeType)).into(this)
             }
         }
+    }
+
+    private fun dump(data: DocumentInfo) {
+        LogUtil.d(TAG, "dump doc data: ${data.path} ${data.documentId} [${data.displayName}], mimeType ${data.mimeType}")
     }
 
     private fun setSummary(data: DocumentInfo, desc: TextView) {

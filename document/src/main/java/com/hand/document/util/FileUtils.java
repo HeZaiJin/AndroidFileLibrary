@@ -973,5 +973,9 @@ public class FileUtils {
         }
     }
 
+    public static boolean isDir(String path) {
+        File file = new File(path);
+        return file.exists() && file.isDirectory();
+    }
 
 }

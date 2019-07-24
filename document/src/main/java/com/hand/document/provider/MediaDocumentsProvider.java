@@ -45,6 +45,8 @@ import com.hand.document.io.IoUtils;
 import com.hand.document.io.Volume;
 import com.hand.document.provider.DocumentsContract.Document;
 import com.hand.document.provider.DocumentsContract.Root;
+import com.hand.document.util.FileUtils;
+import com.hand.document.util.MimeTypes;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -381,17 +383,75 @@ public class MediaDocumentsProvider extends StorageProvider {
             includeFile(result, cursor, TYPE_DOWNLOAD);
         }
     }
+    private void queryLikeFile(ContentResolver resolver, Cursor cursor, MatrixCursor result, String selection, String[] args, String filterMimeType) {
+        // single file
+        cursor = resolver.query(DOCUMENTS_URI,
+                FileQuery.PROJECTION,
+                selection,
+                args,
+                null);
+        copyNotificationUri(result, DOCUMENTS_URI);
+        while (cursor.moveToNext()) {
+            includeFile(result, cursor, TYPE_DOWNLOAD, filterMimeType);
+        }
+    }
 
-    private void includeFile(MatrixCursor result, Cursor cursor, String type) {
+    private void includeFile(MatrixCursor result, Cursor cursor, String type, String filterMimeType) {
         final long id = cursor.getLong(FileQuery._ID);
         final String docId = getDocIdForIdent(type, id);
+
+        //check mimeType
+        String mimeType = cursor.getString(FileQuery.MIME_TYPE);
+        String path = cursor.getString(FileQuery.DATA);
+        if (TextUtils.isEmpty(mimeType)) {
+            if (FileUtils.isDir(path)) {
+                mimeType = Document.MIME_TYPE_DIR;
+            } else {
+                mimeType = MimeTypes.getMimeTypeFromPath(path);
+                if (TextUtils.isEmpty(mimeType)) {
+                    mimeType = "text";
+                }
+            }
+        }
+        if (filterMimeType.equals(mimeType)) {
+            return;
+        }
 
         final MatrixCursor.RowBuilder row = result.newRow();
         row.add(Document.COLUMN_DOCUMENT_ID, docId);
         row.add(Document.COLUMN_DISPLAY_NAME, cursor.getString(FileQuery.TITLE));
         row.add(Document.COLUMN_SIZE, cursor.getLong(FileQuery.SIZE));
-        row.add(Document.COLUMN_MIME_TYPE, cursor.getString(FileQuery.MIME_TYPE));
-        row.add(Document.COLUMN_PATH, cursor.getString(FileQuery.DATA));
+        row.add(Document.COLUMN_PATH, path);
+        row.add(Document.COLUMN_MIME_TYPE, mimeType);
+        row.add(Document.COLUMN_LAST_MODIFIED,
+                cursor.getLong(FileQuery.DATE_MODIFIED) * DateUtils.SECOND_IN_MILLIS);
+        row.add(Document.COLUMN_FLAGS, Document.FLAG_SUPPORTS_THUMBNAIL | Document.FLAG_SUPPORTS_DELETE);
+    }
+
+    private void includeFile(MatrixCursor result, Cursor cursor, String type) {
+        final long id = cursor.getLong(FileQuery._ID);
+        final String docId = getDocIdForIdent(type, id);
+
+        //check mimeType
+        String mimeType = cursor.getString(FileQuery.MIME_TYPE);
+        String path = cursor.getString(FileQuery.DATA);
+        if (TextUtils.isEmpty(mimeType)) {
+            if (FileUtils.isDir(path)) {
+                mimeType = Document.MIME_TYPE_DIR;
+            } else {
+                mimeType = MimeTypes.getMimeTypeFromPath(path);
+                if (TextUtils.isEmpty(mimeType)) {
+                    mimeType = "text";
+                }
+            }
+        }
+
+        final MatrixCursor.RowBuilder row = result.newRow();
+        row.add(Document.COLUMN_DOCUMENT_ID, docId);
+        row.add(Document.COLUMN_DISPLAY_NAME, cursor.getString(FileQuery.TITLE));
+        row.add(Document.COLUMN_SIZE, cursor.getLong(FileQuery.SIZE));
+        row.add(Document.COLUMN_PATH, path);
+        row.add(Document.COLUMN_MIME_TYPE, mimeType);
         row.add(Document.COLUMN_LAST_MODIFIED,
                 cursor.getLong(FileQuery.DATE_MODIFIED) * DateUtils.SECOND_IN_MILLIS);
         row.add(Document.COLUMN_FLAGS, Document.FLAG_SUPPORTS_THUMBNAIL | Document.FLAG_SUPPORTS_DELETE);
@@ -424,8 +484,7 @@ public class MediaDocumentsProvider extends StorageProvider {
             } else if (TYPE_DOWNLOAD_ROOT.equals(ident.type)) {
                 includeFileRoot(result, TYPE_DOWNLOAD_ROOT, R.string.root_downloads, null, true);
             } else if (TYPE_DOWNLOAD.equals(ident.type)) {
-                queryLikeFile(resolver, cursor, result, FileColumns.MIME_TYPE + " != ? " + " AND "
-                        + FileColumns.DATA + " LIKE ? " , new String[]{Document.MIME_TYPE_DIR, "%/Download/%"});
+                queryLikeFile(resolver, cursor, result, FileColumns.DATA + " LIKE ? ", new String[]{"%/Download%"}, Document.MIME_TYPE_DIR);
             } else if (TYPE_IMAGES_ROOT.equals(ident.type)) {
                 // single root
                 includeImagesRootDocument(result);
@@ -521,8 +580,7 @@ public class MediaDocumentsProvider extends StorageProvider {
             if (TYPE_DOCUMENTS_ROOT.equals(ident.type)) {
                 queryLikeFile(resolver, cursor, result, DOCUMENT_MIMES, "text");
             } else if (TYPE_DOWNLOAD_ROOT.equals(ident.type)) {
-                queryLikeFile(resolver, cursor, result, FileColumns.MIME_TYPE + " != ? " + " AND "
-                        + FileColumns.DATA + " LIKE ? " , new String[]{Document.MIME_TYPE_DIR, "%/Download/%"});
+                queryLikeFile(resolver, cursor, result, FileColumns.DATA + " LIKE ? ", new String[]{"%/Download%"}, Document.MIME_TYPE_DIR);
             } else if (TYPE_IMAGES_ROOT.equals(ident.type)) {
                 // include all unique buckets
                 cursor = resolver.query(Images.Media.EXTERNAL_CONTENT_URI,
