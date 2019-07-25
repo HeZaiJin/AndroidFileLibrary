@@ -2,6 +2,7 @@ package com.hand.file.ui
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.TextUtils
@@ -10,7 +11,6 @@ import android.util.SparseArray
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.appbar.AppBarLayout
 import com.hand.document.core.DocumentInfo
@@ -20,14 +20,16 @@ import com.hand.document.operation.*
 import com.hand.document.provider.Providers
 import com.hand.document.util.BuildUtils
 import com.hand.document.util.LogUtil
+import com.hand.document.util.Utils
 import com.hand.file.R
 import com.hand.file.setupActionBar
+import java.io.File
 
 
 /**
  * TODO Document Stack
  */
-class DocumentActivity : AppCompatActivity(),
+class DocumentActivity : BaseActivity(),
     BaseTask.Observer/*, FolderNavigationBar.NavigateListener<DocumentInfo>*/ {
 
     companion object {
@@ -102,16 +104,41 @@ class DocumentActivity : AppCompatActivity(),
         }
     }
 
-    fun openDirectory(rootInfo: RootInfo, documentInfo: DocumentInfo, back: Boolean) {
-        Log.d(TAG, "openDirectory rootInfo $rootInfo, documentInfo $documentInfo")
-        documentInfo.apply {
-            if (!back) {
-                state.pushStack(this)
-                dumpStack()
+    fun pickDocument(rootInfo: RootInfo, documentInfo: DocumentInfo, back: Boolean) {
+        Log.d(TAG, "pickDocument rootInfo $rootInfo, documentInfo $documentInfo")
+        if (documentInfo.isDirectory || documentInfo.isRootDirectory) {
+            documentInfo.apply {
+                if (!back) {
+                    state.pushStack(this)
+                    dumpStack()
+                }
+                DocumentFragment.start(supportFragmentManager, rootInfo, this)
+                onDirectoryChanged(this)
             }
-            DocumentFragment.start(supportFragmentManager, rootInfo, this)
-            onDirectoryChanged(this)
+        } else {
+            //open document
+            val view = Intent(Intent.ACTION_VIEW).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            }
+            if (BuildUtils.hasNougat()) {
+                view.setDataAndType(documentInfo.derivedUri, documentInfo.mimeType)
+            } else {
+                view.setDataAndType(Uri.fromFile(File(documentInfo.path)), documentInfo.mimeType)
+            }
+
+            if (Utils.isIntentAvailable(this, view)) {
+                try {
+                    startActivity(view)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    showToast(R.string.open_file_fail)
+                }
+                return
+            }
+            showToast(R.string.open_file_fail)
         }
+
     }
 
     fun saveDisplayState(key: String, view: View) {
@@ -145,7 +172,7 @@ class DocumentActivity : AppCompatActivity(),
         if (null == documentInfo) {
             documentInfo = DocumentInfo(true)
         }
-        openDirectory(rootInfo, documentInfo, false)
+        pickDocument(rootInfo, documentInfo, false)
     }
 
     fun onDirectoryChanged(documentInfo: DocumentInfo) {
@@ -173,7 +200,7 @@ class DocumentActivity : AppCompatActivity(),
 //                state!!.popStack()
 //                documentInfo = state!!.peekStack()
 //            }
-//            openDirectory(rootInfo!!, info, false)
+//            pickDocument(rootInfo!!, info, false)
 //        }
 //    }
 
@@ -199,7 +226,7 @@ class DocumentActivity : AppCompatActivity(),
         if (state.stackSize > 0) {
             state.popStack()
             state.peekStack()?.run {
-                openDirectory(rootInfo, this, true)
+                pickDocument(rootInfo, this, true)
                 return
             }
         }
@@ -236,5 +263,8 @@ class DocumentActivity : AppCompatActivity(),
 
     override fun onTaskComplete(result: TaskResult) {
         Log.d(TAG, "onTaskComplete state ${result.state}, msg ${result.msg}")
+        showToast(result.msg)
     }
+
+
 }

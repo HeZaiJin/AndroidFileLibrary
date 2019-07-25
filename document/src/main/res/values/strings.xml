@@ -70,4 +70,5 @@
     <string name="cancel">Cancel</string>
 
     <string name="task_progress_desc">Progress %1d in %2d</string>
+    <string name="open_file_fail">Can\'t open file</string>
 </resources>

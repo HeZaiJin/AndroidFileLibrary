@@ -20,7 +20,9 @@ import android.database.AbstractCursor;
 import android.database.Cursor;
 import android.os.Bundle;
 import com.hand.document.core.DocumentInfo;
+import com.hand.document.provider.DocumentsContract;
 import com.hand.document.provider.DocumentsContract.Document;
+import com.hand.document.util.MimePredicate;
 import com.hand.document.util.Utils;
 
 import static com.hand.document.core.Configuration.*;
@@ -68,7 +70,7 @@ public class SortingCursorWrapper extends AbstractCursor {
                     final String mimeType = getCursorString(cursor, Document.COLUMN_MIME_TYPE);
                     final String displayName = getCursorString(
                             cursor, Document.COLUMN_DISPLAY_NAME);
-                    if (Utils.isDir(mimeType)) {
+                    if (MimePredicate.mimeMatches(DocumentsContract.Document.MIME_TYPE_DIR, mimeType)) {
                         mValueString[i] = DocumentInfo.DIR_PREFIX + displayName;
                     } else {
                         mValueString[i] = displayName;

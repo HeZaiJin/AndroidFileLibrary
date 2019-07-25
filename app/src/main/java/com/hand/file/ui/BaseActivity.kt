@@ -2,7 +2,10 @@ package com.hand.file.ui
 
 import android.Manifest
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
+import com.hand.file.R
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -33,5 +36,18 @@ abstract class BaseActivity : AppCompatActivity() {
         if (!mPermissionSubscribe!!.isDisposed) {
             mPermissionSubscribe!!.dispose()
         }
+    }
+
+
+    private fun getContentView(): View {
+        return findViewById(R.id.contentPanel)
+    }
+
+    fun showToast(msg: String) {
+        Snackbar.make(getContentView(), msg, Snackbar.LENGTH_SHORT).show()
+    }
+
+    fun showToast(msg: Int) {
+        Snackbar.make(getContentView(), msg, Snackbar.LENGTH_SHORT).show()
     }
 }

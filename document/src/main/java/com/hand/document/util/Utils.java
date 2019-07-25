@@ -16,7 +16,13 @@
 
 package com.hand.document.util;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import com.hand.document.provider.DocumentsContract;
+
+import java.util.List;
 
 public class Utils {
 
@@ -504,7 +510,12 @@ public class Utils {
     public static boolean checkUSBDevices() {
         return !hasNougat() || DocumentsApplication.isTelevision();
     }*/
-    public static boolean isDir(String mimeType) {
-        return MimePredicate.mimeMatches(DocumentsContract.Document.MIME_TYPE_DIR, mimeType);
+
+    public static boolean isIntentAvailable(Context context, Intent intent) {
+        final PackageManager packageManager = context.getPackageManager();
+        List<ResolveInfo> list =
+                packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        return list.size() > 0;
     }
+
 }
